@@ -1,16 +1,15 @@
 import React from "react";
-import { faMoon, faSearch, faSun } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AllHabitsTopBar from "./components/AllHabitsTopBar";
 import AllHabitsRightSideBar from "./components/AllHabitsRightSideBar";
-import AllHabitsSearchBar from "./components/AllHabitsSearchBar";
 import HabitsContainer from "./components/HabitsContainer";
 import HabitCompleted from "./components/HabitCompleted";
+import HabitWindow from "./components/HabitWindow";
 
 const AllHabits = () => {
   return (
-    <div className="w-full flex">
-      <div className="w-[80%] m-5">
+    <div className="max-lg:flex-col w-full flex flex-row gap-0 relative">
+      <HabitWindow />
+      <div className="flex-col flex-grow m-3">
         <AllHabitsTopBar />
         <HabitsContainer />
         <HabitCompleted />

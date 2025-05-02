@@ -2,8 +2,12 @@ import React from "react";
 import { faCode, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useGlobalContextProvider } from "@/app/contextApi";
 
 const HabitContainerTop = () => {
+  const { habitWindowObject, darkModeObject } = useGlobalContextProvider();
+  const { setOpenHabitWindow } = habitWindowObject;
+
   return (
     <div className="p-3 flex flex-row justify-between items-center">
       <div className="flex justify-between gap-4 items-center">
@@ -31,10 +35,11 @@ const HabitContainerTop = () => {
           </div>
         </div>
       </div>
-
       {/* . */}
-
-      <button className="bg-blue-500 text-white p-3 flex gap-2 items-center rounded-md text-sm">
+      <button
+        onClick={() => setOpenHabitWindow(true)}
+        className="bg-blue-500 text-white p-3 flex gap-2 items-center rounded-md text-sm cursor-pointer"
+      >
         <FontAwesomeIcon icon={faPlus} />
         <span> New Habit </span>
       </button>

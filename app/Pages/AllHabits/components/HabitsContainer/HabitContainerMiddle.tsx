@@ -5,24 +5,45 @@ import { Checkbox, IconButton } from "@mui/material";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { darkModeColor, defaultColor } from "@/colors";
+import { useGlobalContextProvider } from "@/app/contextApi";
 
 const HabitContainerMiddle = () => {
   return (
     <div className=" ">
+      <HabitCard />
+      <HabitCard />
       <HabitCard />
     </div>
   );
 };
 
 function HabitCard() {
+  const { darkModeObject } = useGlobalContextProvider();
+  const { isDarkMode } = darkModeObject;
+
   return (
-    <div className="flex p-3 items-center justify-between border">
+    <div className="flex p-3 items-center justify-between">
       {/* checkbox */}
       <Checkbox
         icon={<RadioButtonUncheckedIcon />}
         checkedIcon={<CheckCircleIcon />}
+        sx={{
+          color: defaultColor.circleCheckbox,
+          "&.Mui-checked": {
+            color: defaultColor.circleCheckbox,
+          },
+        }}
       />
-      <div className="flex justify-between gap-2 w-full p-3 py-4 rounded-md bg-slate-50">
+      <div
+        style={{
+          color: isDarkMode ? darkModeColor.textColor : defaultColor.textColor,
+          backgroundColor: isDarkMode
+            ? darkModeColor.background
+            : defaultColor.background,
+        }}
+        className="flex justify-between gap-2 w-full p-3 py-4 rounded-md bg-slate-50"
+      >
         <div className="w-full">
           {/* . */}
           <div className="flex gap-2 justify-between">
@@ -38,18 +59,38 @@ function HabitCard() {
           </div>
           {/* . */}
           <div className="flex gap-2 mt-2">
-            <div className="p-1 text-white bg-blue-500 text-[12px] rounded-md px-2">
+            <div
+              style={{
+                color: isDarkMode
+                  ? darkModeColor.textColor
+                  : defaultColor.default,
+                backgroundColor: isDarkMode
+                  ? defaultColor[50]
+                  : defaultColor[100],
+              }}
+              className="p-1 text-white bg-blue-500 text-[12px] rounded-md px-2"
+            >
               <span> Area1 </span>
             </div>
-            <div className="p-1 text-white bg-blue-500 text-[12px] rounded-md px-2">
-              <span> Area1 </span>
+            <div
+              style={{
+                color: isDarkMode
+                  ? darkModeColor.textColor
+                  : defaultColor.default,
+                backgroundColor: isDarkMode
+                  ? defaultColor[50]
+                  : defaultColor[100],
+              }}
+              className="p-1 text-white bg-blue-500 text-[12px] rounded-md px-2"
+            >
+              <span> Area2 </span>
             </div>
           </div>
         </div>
         {/* button */}
         <div className="w-10 flex items-center justify-center">
           <IconButton>
-            <MoreVertIcon />
+            <MoreVertIcon sx={{ color: isDarkMode ? "white" : "gray" }} />
           </IconButton>
         </div>
       </div>
