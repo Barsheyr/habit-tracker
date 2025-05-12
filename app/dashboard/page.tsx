@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { SignOutButton, useUser } from "@clerk/nextjs";
+// import { SignOutButton, useUser } from "@clerk/nextjs";
 import Sidebar from "../components/Sidebar/Sidebar";
 import { useGlobalContextProvider } from "../contextApi";
 import { menuItemType } from "../Types/MenuItemTypes";
@@ -62,13 +62,18 @@ const Dashboard = () => {
 export default Dashboard;
 
 function BlackSoftLayer() {
-  const { openSideBarObject } = useGlobalContextProvider();
+  const { openSideBarObject, habitWindowObject, openConfirmationWindowObject } =
+    useGlobalContextProvider();
   const { openSideBar } = openSideBarObject;
+  const { openHabitWindow } = habitWindowObject;
+  const { openConfirmationWindow } = openConfirmationWindowObject;
 
   return (
     <div
       className={`w-full h-full bg-black fixed top-0 left-0 opacity-20 z-40 ${
-        openSideBar ? "fixed" : "hidden"
+        openSideBar || openHabitWindow || openConfirmationWindow
+          ? "fixed"
+          : "hidden"
       }`}
     ></div>
   );

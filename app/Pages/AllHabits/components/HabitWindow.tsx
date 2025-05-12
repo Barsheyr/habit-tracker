@@ -1,36 +1,19 @@
 "use client";
 
-import React, {
-  memo,
-  useEffect,
-  useState,
-  useRef,
-  SetStateAction,
-} from "react";
+import React, { useEffect, useState, useRef, SetStateAction } from "react";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import {
-  faArrowAltCircleDown,
-  faQuestion,
-} from "@fortawesome/free-solid-svg-icons";
+import { faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconWindow } from "./IconWindow/IconWindow";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { TimerPicker } from "./TimePicker";
-
-type FrequencyType = {
-  type: string;
-  day: string[];
-  number: number;
-};
-
-type HabitType = {
-  _id: string;
-  name: string;
-  icon: IconProp;
-  frequency: FrequencyType[];
-};
+import HabitWindowArea from "./HabitWindow/HabitWindowAreas";
+import { AreaType } from "@/app/Types/GlobalTypes";
+import { HabitType } from "@/app/Types/GlobalTypes";
+import { addNewHabit } from "@/app/utils/allHabitUtils/addNewHabit";
+import toast from "react-hot-toast";
 
 type RepeatOption = {
   name: string;
@@ -52,7 +35,11 @@ const HabitWindow = () => {
     _id: "",
     name: "",
     icon: faQuestion,
-    frequency: [{ type: "Daily", day: ["M"], number: 1 }],
+    frequency: [{ type: "Daily", days: ["M"], number: 1 }],
+    notificationTime: "",
+    isNotificationOn: false,
+    areas: [],
+    completedDays: [],
   });
 
   const [openIconWindow, setOpenIconWindow] = useState<boolean>(false);
@@ -95,7 +82,7 @@ const HabitWindow = () => {
       .map((day) => day.name);
     const copyHabitItems = { ...habitItem };
 
-    copyHabitItems.frequency[0].day = selectedDays;
+    copyHabitItems.frequency[0].days = selectedDays;
 
     setHabitItem(copyHabitItems);
   }
@@ -109,6 +96,28 @@ const HabitWindow = () => {
     setHabitItem(copyHabitsItem);
   }
 
+  // This callback function will update the notification property selected from the TimerPicker window
+  function updateReminderTime(timeValue: string) {
+    // we create a shallow copy pf the habit item
+    const copyHabitsItem = { ...habitItem };
+
+    // update the notification Time property
+    copyHabitsItem.notificationTime = timeValue;
+
+    // update the habit item to update the UI
+    setHabitItem(copyHabitsItem);
+  }
+
+  function getSelectedAreaItems(selectedAreaItems: AreaType[]) {
+    // we create a shallow copy of the habit type
+    const copyHabitsItem = { ...habitItem };
+
+    //update the area property
+    copyHabitsItem.areas = selectedAreaItems;
+    // update the habit item to update the ui
+    setHabitItem(copyHabitsItem);
+  }
+
   useEffect(() => {
     // creating a shallow copy of the habit item
     const copyHabitItem = { ...habitItem };
@@ -117,6 +126,21 @@ const HabitWindow = () => {
     // updating the habit item state
     setHabitItem(copyHabitItem);
   }, [iconSelected]);
+
+  useEffect(() => {
+    if (openHabitWindow) {
+      setHabitItem({
+        _id: "",
+        name: "",
+        icon: faQuestion,
+        frequency: [{ type: "Daily", days: ["Mo"], number: 1 }],
+        notificationTime: "",
+        isNotificationOn: false,
+        areas: [],
+        completedDays: [],
+      });
+    }
+  }, [openHabitWindow]);
 
   return (
     <div
@@ -149,8 +173,10 @@ const HabitWindow = () => {
         onChangeWeeksOption={changeWeeksOption}
       />
 
-      <TimerPicker />
+      <TimerPicker onSaveTime={updateReminderTime} />
 
+      <Reminder habitItem={habitItem} setHabitItem={setHabitItem} />
+      <HabitWindowArea onChange={getSelectedAreaItems} />
       <SaveButton habit={habitItem} />
     </div>
   );
@@ -249,13 +275,13 @@ function Repeat({
   ]);
 
   const days: DayOption[] = [
-    { id: 1, name: "M", isSelected: true },
-    { id: 2, name: "T", isSelected: false },
-    { id: 3, name: "W", isSelected: false },
-    { id: 4, name: "T", isSelected: false },
-    { id: 5, name: "F", isSelected: false },
-    { id: 6, name: "S", isSelected: false },
-    { id: 7, name: "S", isSelected: false },
+    { id: 1, name: "Mo", isSelected: true },
+    { id: 2, name: "Tu", isSelected: false },
+    { id: 3, name: "We", isSelected: false },
+    { id: 4, name: "Th", isSelected: false },
+    { id: 5, name: "Fr", isSelected: false },
+    { id: 6, name: "Sa", isSelected: false },
+    { id: 7, name: "Su", isSelected: false },
   ];
 
   const [allDays, setAllDays] = useState<DayOption[]>(days);
@@ -295,6 +321,7 @@ function Repeat({
 
     setNameOfSelectedOption(getNameOptionSelected);
   }, [repeatOptions]);
+
   return (
     <div className="flex flex-col gap-2 mt-10 px-3">
       <span className="font-semibold text-[17px]"> Repeat </span>
@@ -326,8 +353,6 @@ function Repeat({
       ) : (
         <WeeklyOption weeks={weeks} setWeek={setWeeks} />
       )}
-
-      <Reminder />
     </div>
   );
 }
@@ -339,8 +364,9 @@ function DailyOptions({
   allDays: DayOption[];
   setAllDays: React.Dispatch<React.SetStateAction<DayOption[]>>;
 }) {
-  const { darkModeObject } = useGlobalContextProvider();
+  const { darkModeObject, habitWindowObject } = useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
+  const { openHabitWindow } = habitWindowObject;
 
   function selectedDays(singleDayIndex: number) {
     const selectedCount: number = allDays.filter(
@@ -363,6 +389,17 @@ function DailyOptions({
 
     setAllDays(updateAllDays);
   }
+
+  useEffect(() => {
+    if (openHabitWindow) {
+      const updateSelectedDays = allDays.map((singleDay) => {
+        return { ...singleDay, isSelected: false };
+      });
+
+      updateSelectedDays[0].isSelected = true;
+      setAllDays(updateSelectedDays);
+    }
+  }, [openHabitWindow]);
 
   return (
     <div className="mt-5 flex flex-col gap-4">
@@ -453,7 +490,13 @@ function WeeklyOption({
   );
 }
 
-function Reminder() {
+function Reminder({
+  habitItem,
+  setHabitItem,
+}: {
+  habitItem: HabitType;
+  setHabitItem: React.Dispatch<React.SetStateAction<HabitType>>;
+}) {
   const { darkModeObject, openTimePickerObject } = useGlobalContextProvider();
   const { setOpenTimePickerWindow } = openTimePickerObject;
   const { isDarkMode } = darkModeObject;
@@ -461,6 +504,9 @@ function Reminder() {
   const [isOn, setIsOn] = useState(false);
 
   function updateToggle() {
+    const copyHabitItem = { ...habitItem };
+    copyHabitItem.isNotificationOn = !isOn;
+    setHabitItem(copyHabitItem);
     setIsOn(!isOn);
   }
 
@@ -491,7 +537,11 @@ function Reminder() {
             onClick={openTheTimerPicker}
             className="flex gap-2 items-center justify-center cursor-pointer select-none"
           >
-            <span> 08:00 am </span>
+            <span>
+              {habitItem.notificationTime !== ""
+                ? habitItem.notificationTime
+                : "none"}
+            </span>
             <FontAwesomeIcon height={12} width={12} icon={faChevronDown} />
           </div>
         </div>
@@ -519,18 +569,29 @@ function Reminder() {
 }
 
 function SaveButton({ habit }: { habit: HabitType }) {
-  const { darkModeObject } = useGlobalContextProvider();
-  const { isDarkMode } = darkModeObject;
+  const { allHabitsObject, habitWindowObject } = useGlobalContextProvider();
+  const { allHabits, setAllHabits } = allHabitsObject;
+  const { setOpenHabitWindow } = habitWindowObject;
+
+  function checkNewHabitObject() {
+    if (habit.name.trim() === "") {
+      return toast.error("the habit name is still empty");
+    }
+    const habitExist = allHabits.some(
+      (singleHabit) => singleHabit.name === habit.name
+    );
+
+    if (!habitExist) {
+      addNewHabit({ allHabits, setAllHabits, newHabit: habit });
+      setOpenHabitWindow(false);
+    } else {
+      toast.error("Habit already exist");
+    }
+  }
+
   return (
-    <div className="w-full flex justify-center mt-9">
-      <button
-        style={{
-          backgroundColor: isDarkMode ? defaultColor.blue : defaultColor.blue,
-          color: isDarkMode ? defaultColor.textColor : darkModeColor.whiteColor,
-        }}
-        onClick={() => console.log(habit)}
-        className="p-4 w-full rounded-md text-white"
-      >
+    <div className="w-full flex justify-center mt-9 bg-blue-600 shadow-2xl rounded-md">
+      <button onClick={checkNewHabitObject} className="p-4 w-full text-white">
         Add a Habit
       </button>
     </div>

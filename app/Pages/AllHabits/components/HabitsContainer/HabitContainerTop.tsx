@@ -1,23 +1,56 @@
-import React from "react";
-import { faCode, faPlus } from "@fortawesome/free-solid-svg-icons";
+import React, { useEffect } from "react";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGlobalContextProvider } from "@/app/contextApi";
+import {
+  getFormattedDate,
+  getDateString,
+  getCurrentDayName,
+} from "@/app/utils/allHabitUtils/DateFunctions";
 
 const HabitContainerTop = () => {
-  const { habitWindowObject, darkModeObject } = useGlobalContextProvider();
+  const { habitWindowObject, selectedCurrentDayObject, offsetDayObject } =
+    useGlobalContextProvider();
   const { setOpenHabitWindow } = habitWindowObject;
+  const { selectedCurrentDate, setSelectedCurrentDate } =
+    selectedCurrentDayObject;
+
+  const { offsetDay, setOffsetDay } = offsetDayObject;
+
+  type Option = "next" | "prev";
+  function updateDate(option: Option) {
+    if (option === "next") {
+      setOffsetDay((prev) => prev + 1);
+    }
+    if (option === "prev") {
+      setOffsetDay((prev) => prev - 1);
+    }
+  }
+
+  useEffect(() => {
+    console.log(offsetDay);
+
+    setSelectedCurrentDate(getDateString(new Date(), offsetDay));
+  }, [offsetDay]);
 
   return (
     <div className="p-3 flex flex-row justify-between items-center">
       <div className="flex justify-between gap-4 items-center">
         <div>
-          <h2 className="font-bold text-lg"> Sunday </h2>
-          <span className="font-light text-[12px]"> 17 May 2024 </span>
+          <h2 className="font-bold text-lg">
+            {getCurrentDayName(selectedCurrentDate)}
+          </h2>
+          <span className="font-light text-[12px]">
+            {getFormattedDate(selectedCurrentDate)}
+          </span>
         </div>
         {/* . */}
         <div className="flex gap-1 ml-4">
-          <div className="bg-blue-500 rounded-full cursor-pointer">
+          <div
+            onClick={() => updateDate("prev")}
+            className="bg-blue-500 rounded-full cursor-pointer"
+          >
             <FontAwesomeIcon
               height={20}
               width={20}
@@ -25,7 +58,10 @@ const HabitContainerTop = () => {
               className="text-white"
             />
           </div>
-          <div className="bg-blue-500 rounded-full cursor-pointer">
+          <div
+            onClick={() => updateDate("next")}
+            className="bg-blue-500 rounded-full cursor-pointer"
+          >
             <FontAwesomeIcon
               height={20}
               width={20}

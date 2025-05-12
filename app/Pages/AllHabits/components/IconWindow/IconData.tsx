@@ -77,3 +77,78 @@ export const iconData: iconData[] = [
   { faIcon: faLightbulb, isSelected: false },
   { faIcon: faPlaneDeparture, isSelected: false },
 ];
+
+export function textToIcon(iconText: string): IconProp | string {
+  switch (iconText) {
+    case "faCalculator":
+      return faCalculator;
+    case "faFlask":
+      return faFlask;
+    case "faBook":
+      return faBook;
+    case "faGlobe":
+      return faGlobe;
+    case "faLaptopCode":
+      return faLaptopCode;
+    case "faPalette":
+      return faPalette;
+    case "faComments":
+      return faComments;
+    case "faPhoneAlt":
+      return faPhoneAlt;
+    case "faShareAlt":
+      return faShareAlt;
+    case "faEnvelope":
+      return faEnvelope;
+    case "faSearch":
+      return faSearch;
+    case "faSlidersH":
+      return faSlidersH;
+    case "faFilter":
+      return faFilter;
+    case "faSort":
+      return faSort;
+    case "faChartPie":
+      return faChartPie;
+    case "faTable":
+      return faTable;
+    case "faDatabase":
+      return faDatabase;
+    case "faFileAlt":
+      return faFileAlt;
+    case "faCamera":
+      return faCamera;
+    case "faQuestion":
+      return faQuestion;
+    case "faCogs":
+      return faCogs;
+    case "faCodeBranch":
+      return faCodeBranch;
+    case "faUser":
+      return faUser;
+    case "faGraduationCap":
+      return faGraduationCap;
+    case "faHandshake":
+      return faHandshake;
+    case "faUsers":
+      return faUsers;
+    case "faChartLine":
+      return faChartLine;
+    case "faMoneyBill":
+      return faMoneyBill;
+    case "faBriefcase":
+      return faBriefcase;
+    case "faBullhorn":
+      return faBullhorn;
+    case "faTools":
+      return faTools;
+    case "faGavel":
+      return faGavel;
+    case "faLightbulb":
+      return faLightbulb;
+    case "faPlaneDeparture":
+      return faPlaneDeparture;
+    default:
+      return iconText; // fallback if no match found
+  }
+}

@@ -1,7 +1,6 @@
 import React from "react";
 import HabitContainerTop from "./HabitsContainer/HabitContainerTop";
 import HabitContainerMiddle from "./HabitsContainer/HabitContainerMiddle";
-import HabitCompleted from "./HabitCompleted";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
 

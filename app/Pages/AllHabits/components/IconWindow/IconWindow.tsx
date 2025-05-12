@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { iconData } from "./IconData";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { defaultColor, darkModeColor } from "@/colors";
+import { darkModeColor } from "@/colors";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export function IconWindow({
