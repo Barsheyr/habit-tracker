@@ -569,19 +569,33 @@ function Reminder({
 }
 
 function SaveButton({ habit }: { habit: HabitType }) {
-  const { allHabitsObject, habitWindowObject } = useGlobalContextProvider();
+  const { allHabitsObject, habitWindowObject, selectedItemsObject } =
+    useGlobalContextProvider();
   const { allHabits, setAllHabits } = allHabitsObject;
-  const { setOpenHabitWindow } = habitWindowObject;
+  const { openHabitWindow, setOpenHabitWindow } = habitWindowObject;
+  const { selectedItems } = selectedItemsObject;
+  const [buttonText, setButtonText] = useState("Add a Habit");
+
+  useEffect(() => {
+    selectedItems ? setButtonText("Edit Habit") : setButtonText("Add a Habit");
+  }, [openHabitWindow]);
 
   function checkNewHabitObject() {
     if (habit.name.trim() === "") {
-      return toast.error("the habit name is still empty");
+      return toast.error("the habit name filed is still empty");
     }
     const habitExist = allHabits.some(
       (singleHabit) => singleHabit.name === habit.name
     );
 
     if (!habitExist) {
+      try {
+        setAllHabits([...allHabits, habit]);
+        toast.success("Habit already exist");
+      } catch (error) {
+        console.log("wrong");
+        toast.error("Habit already exist");
+      }
       addNewHabit({ allHabits, setAllHabits, newHabit: habit });
       setOpenHabitWindow(false);
     } else {

@@ -10,17 +10,22 @@ interface dropMenuItem {
   icon: IconProp;
 }
 
-function Dropdown() {
+export function Dropdown() {
   const {
     darkModeObject,
     openDropDownObject,
     dropDownPositionObject,
     openConfirmationWindowObject,
+    selectedItemsObject,
+    habitWindowObject,
   } = useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
   const { openDropdown, setOpenDropdown } = openDropDownObject;
   const { dropDownPositions } = dropDownPositionObject;
-  const { setOpenConfirmationWindow } = openConfirmationWindowObject;
+  const { openConfirmationWindow, setOpenConfirmationWindow } =
+    openConfirmationWindowObject;
+  const { setSelectedItems } = selectedItemsObject;
+  const { setOpenHabitWindow } = habitWindowObject;
 
   const ref = useRef<HTMLDivElement>(null);
   const dropDownMenuItems: dropMenuItem[] = [
@@ -39,7 +44,8 @@ function Dropdown() {
   function handleClickOption(index: number) {
     switch (index) {
       case 0:
-        console.log("edit");
+        setOpenHabitWindow(true);
+        setOpenDropdown(false);
         break;
       case 1:
         setOpenConfirmationWindow(true);
@@ -54,6 +60,10 @@ function Dropdown() {
     function handleOutsideClick(event: MouseEvent) {
       if (ref && !ref.current?.contains(event.target as Node)) {
         setOpenDropdown(false);
+
+        if (!openConfirmationWindow) {
+          setSelectedItems(null);
+        }
       }
     }
 
@@ -73,9 +83,7 @@ function Dropdown() {
           : defaultColor.background,
       }}
       className={`p-3 w-40 fixed z-[60] shadow-md flex rounded-lg 
-        flex-col gap-3 text-[11px] top-11 left-1/3 ${
-          openDropdown ? "block" : "hidden"
-        }`}
+        flex-col gap-3 text-[11px]  ${openDropdown ? "block" : "hidden"}`}
     >
       {dropDownMenuItems.map((menuItem, index) => (
         <div
@@ -106,12 +114,12 @@ function Dropdown() {
             style={{
               color:
                 hover && index === indexHovered
-                  ? "#fffff"
+                  ? "#ffffff"
                   : !isDarkMode
                   ? "black"
                   : "white",
             }}
-            className=""
+            className="text-md font-semibold tracking-wider"
           >
             {menuItem.name}
           </div>

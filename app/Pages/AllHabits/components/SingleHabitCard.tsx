@@ -81,12 +81,13 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
   }
 
   function handleClickedThreeDots(event: React.MouseEvent<HTMLButtonElement>) {
-    const target = event.target as HTMLElement;
+    const target = event.currentTarget as HTMLElement;
     const rect = target.getBoundingClientRect();
     const top = rect.top;
     const left = rect.left;
-    setDropDownPositions({ top, left });
 
+    setDropDownPositions({ top, left });
+    console.log(singleHabit);
     event.stopPropagation();
     setOpenDropdown(true);
     // select the single habit

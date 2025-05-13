@@ -2,7 +2,6 @@ import React from "react";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import { HabitCard } from "./SingleHabitCard";
-import { HabitType } from "@/app/Types/GlobalTypes";
 
 const HabitCompleted = () => {
   const { darkModeObject, allFilteredHabitsObject, selectedCurrentDayObject } =
@@ -31,16 +30,16 @@ const HabitCompleted = () => {
       <div className="mt-4 opacity-50">
         <div className="mt-10 flex items-center justify-center w-full">
           {areaAllHabitsNotCompleted && (
-            <p className="text-lg text-gray-400 w-72">
+            <p className="text-lg text-gray-400 w-72 text-center ">
               Habit stacking is like a superpower! Do not let it go to waste
             </p>
           )}
         </div>
-        {allFilteredHabits.map((singleHabit, singleHabitIndex) => (
-          <div key={singleHabitIndex}>
+        {allFilteredHabits.map((singleHabit, index) => (
+          <div key={index}>
             {singleHabit.completedDays.some(
               (day) => day.date === selectedCurrentDate
-            ) === false && <HabitCard singleHabit={singleHabit} />}
+            ) === true && <HabitCard singleHabit={singleHabit} />}
           </div>
         ))}
       </div>
