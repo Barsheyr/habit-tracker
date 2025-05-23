@@ -9,20 +9,20 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { AreaType } from "@/app/Types/GlobalTypes";
-import { defaultColor } from "@/colors";
+import { AreaType, HabitType } from "@/app/Types/GlobalTypes";
+import { darkModeColor, defaultColor } from "@/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
+// const MenuProps = {
+//   PaperProps: {
+//     style: {
+//       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//       width: 250,
+//     },
+//   },
+// };
 
 function getStyles(
   name: string,
@@ -42,11 +42,31 @@ export default function MultipleSelectChip({
   onChange: (selectedAreasItems: any) => void;
 }) {
   const theme = useTheme();
-  const { allAreasObject } = useGlobalContextProvider();
+  const {
+    allAreasObject,
+    selectedItemsObject,
+    darkModeObject,
+    habitWindowObject,
+  } = useGlobalContextProvider();
   const { allAreas } = allAreasObject;
+  const { selectedItems } = selectedItemsObject;
+  const { isDarkMode } = darkModeObject;
+  const { openHabitWindow } = habitWindowObject;
 
   const [selectedAreas, setSelectedAreas] = React.useState<string[]>([]);
   const [selectedAreasItems, setSelectedAreasItems] = useState<any>([]);
+
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+        backgroundColor: isDarkMode
+          ? darkModeColor.background
+          : defaultColor.background,
+      },
+    },
+  };
 
   const handleChange = (event: SelectChangeEvent<typeof selectedAreas>) => {
     const {
@@ -74,6 +94,23 @@ export default function MultipleSelectChip({
   React.useEffect(() => {
     onChange(selectedAreasItems);
   }, [selectedAreasItems]);
+
+  React.useEffect(() => {
+    // if we want to edit a habit
+    if (selectedItems) {
+      const habitSelected = selectedItems as HabitType;
+      const { areas } = habitSelected;
+
+      const selectedArea = areas.map((area) => {
+        return area.name;
+      });
+
+      setSelectedAreas(selectedArea);
+    } else {
+      // when we open the habit window, empty the selectedAreas
+      setSelectedAreas([]);
+    }
+  }, [openHabitWindow]);
 
   return (
     <div>
@@ -121,7 +158,15 @@ export default function MultipleSelectChip({
           renderValue={(selected) => (
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
               {selected.map((value) => (
-                <Chip key={value} label={value} />
+                <Chip
+                  key={value}
+                  label={value}
+                  sx={{
+                    backgroundColor: isDarkMode
+                      ? defaultColor.textColor
+                      : defaultColor[100],
+                  }}
+                />
               ))}
             </Box>
           )}
@@ -129,12 +174,17 @@ export default function MultipleSelectChip({
         >
           {filteredAreas.map((area) => (
             <MenuItem
-              key={area.id}
+              key={area._id}
               value={area.name}
               style={getStyles(area.name, selectedAreas, theme)}
+              sx={{
+                color: isDarkMode
+                  ? darkModeColor.textColor
+                  : defaultColor.textColor,
+              }}
             >
               <FontAwesomeIcon
-                className="text-red-500"
+                className="text-blue-500"
                 icon={area.icon}
                 style={{ marginRight: 8 }}
               />

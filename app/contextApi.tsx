@@ -18,14 +18,11 @@ import {
   faLayerGroup,
   faMoon,
   faSun,
-  faCode,
-  faGraduationCap,
-  faRunning,
-  faBorderAll,
 } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { getDateString } from "./utils/allHabitUtils/DateFunctions";
 import { v4 as uuidv4 } from "uuid";
+import { useUser } from "@clerk/nextjs";
 
 const GlobalContext = createContext<GlobalContextType>({
   menuItemsObject: {
@@ -104,12 +101,7 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
     { id: 1, icon: faSun, isSelected: true },
     { id: 2, icon: faMoon, isSelected: false },
   ]);
-  const [allAreas, setAllAreas] = useState<AreaType[]>([
-    { _id: uuidv4(), icon: faBorderAll, name: "All" },
-    { _id: uuidv4(), icon: faGraduationCap, name: "Study" },
-    { _id: uuidv4(), icon: faCode, name: "Code" },
-    { _id: uuidv4(), icon: faRunning, name: "Work Out" },
-  ]);
+  const [allAreas, setAllAreas] = useState<AreaType[]>([]);
 
   const [openSideBar, setOpenSideBar] = useState(false);
   const [isDarkMode, setDarkMode] = useState<boolean>(false);
@@ -134,6 +126,8 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
     HabitType | AreaType | null
   >(null);
 
+  const { isLoaded, isSignedIn, user } = useUser();
+
   useEffect(() => {
     function fetchData() {
       const allHabitsData: HabitType[] = [
@@ -141,12 +135,17 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
           _id: uuidv4(),
           name: "habit 1",
           icon: textToIcon("faTools") as IconProp,
-          frequency: [{ type: "Daily", days: ["Mo"], number: 1 }],
+          clerkUserId: user?.id || "",
+          frequency: [{ type: "Daily", days: ["Mo", "Sa"], number: 1 }],
           notificationTime: "",
           isNotificationOn: false,
           areas: [
-            { _id: uuidv4(), icon: faGraduationCap, name: "Study" },
-            { _id: uuidv4(), icon: faCode, name: "Code" },
+            {
+              _id: uuidv4(),
+              icon: textToIcon("faGraduationCap"),
+              name: "Study",
+            },
+            { _id: uuidv4(), icon: textToIcon("faCode"), name: "Code" },
           ],
           completedDays: [
             { _id: uuidv4(), date: "03/06/2024" },
@@ -160,8 +159,24 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
       }, 1000);
     }
 
+    function fetchAllAreas() {
+      const allAreasData: AreaType[] = [
+        { _id: uuidv4(), icon: textToIcon("faGlobe"), name: "All" },
+        { _id: uuidv4(), icon: textToIcon("faBook"), name: "Study" },
+        { _id: uuidv4(), icon: textToIcon("faLaptopCode"), name: "Code" },
+      ];
+
+      setAllAreas(allAreasData);
+    }
+
     fetchData();
-  }, []);
+    fetchAllAreas();
+  }, [isSignedIn, isLoaded]);
+
+  //Each time the menu items are updated, the sidebar is closed
+  useEffect(() => {
+    setOpenSideBar(false);
+  }, [menuItems]);
 
   return (
     <GlobalContext.Provider

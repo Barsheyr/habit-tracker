@@ -11,7 +11,6 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 export function IconWindow({
   openIconWindow,
   setOpenIconWindow,
-  iconSelected,
   setIconSelected,
 }: {
   openIconWindow: boolean;

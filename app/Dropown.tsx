@@ -24,10 +24,11 @@ export function Dropdown() {
   const { dropDownPositions } = dropDownPositionObject;
   const { openConfirmationWindow, setOpenConfirmationWindow } =
     openConfirmationWindowObject;
-  const { setSelectedItems } = selectedItemsObject;
-  const { setOpenHabitWindow } = habitWindowObject;
+  const { setSelectedItems, selectedItems } = selectedItemsObject;
+  const { setOpenHabitWindow, openHabitWindow } = habitWindowObject;
 
   const ref = useRef<HTMLDivElement>(null);
+
   const dropDownMenuItems: dropMenuItem[] = [
     { name: "Edit", icon: faPencil },
     { name: "Remove", icon: faTrash },
@@ -43,10 +44,12 @@ export function Dropdown() {
 
   function handleClickOption(index: number) {
     switch (index) {
+      //Edit Option
       case 0:
         setOpenHabitWindow(true);
         setOpenDropdown(false);
         break;
+      //Delete Option
       case 1:
         setOpenConfirmationWindow(true);
         setOpenDropdown(false);
@@ -61,7 +64,7 @@ export function Dropdown() {
       if (ref && !ref.current?.contains(event.target as Node)) {
         setOpenDropdown(false);
 
-        if (!openConfirmationWindow) {
+        if (!openConfirmationWindow && !openHabitWindow) {
           setSelectedItems(null);
         }
       }

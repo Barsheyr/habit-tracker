@@ -8,6 +8,7 @@ import { useGlobalContextProvider } from "@/app/contextApi";
 import { HabitType } from "@/app/Types/GlobalTypes";
 import { darkModeColor, defaultColor } from "@/colors";
 import { v4 as uuidv4 } from "uuid";
+import convertIconsToTextOfHabits from "@/app/utils/allHabitUtils/editHabits";
 
 export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
   const {
@@ -25,8 +26,14 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
   const { setDropDownPositions } = dropDownPositionObject;
   const { setSelectedItems } = selectedItemsObject;
 
+  const currentHabit =
+    allHabits.find((habit) => habit._id === singleHabit._id) || singleHabit;
+
+  // const [checked, setChecked] = useState(
+  //   singleHabit.completedDays.some((day) => day.date === selectedCurrentDate)
+  // );
   const [checked, setChecked] = useState(
-    singleHabit.completedDays.some((day) => day.date === selectedCurrentDate)
+    currentHabit.completedDays.some((day) => day.date === selectedCurrentDate)
   );
 
   function handleClickedCheckbox(event: React.ChangeEvent<HTMLInputElement>) {
@@ -51,6 +58,9 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
       completedDays: [...singleHabit.completedDays, completedDay],
     };
 
+    const habitToUpdateInTheServer = convertIconsToTextOfHabits(updatedHabits);
+    editTheHabitInServer(habitToUpdateInTheServer);
+
     // update the habits state
     const updateAllHabits: HabitType[] = allHabits.map((habit) => {
       if (habit._id === updatedHabits._id) {
@@ -70,6 +80,12 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
       ),
     };
 
+    const habitToUpdateInTheServer =
+      convertIconsToTextOfHabits(updateAllHabits);
+
+    editTheHabitInServer(habitToUpdateInTheServer);
+
+    // update the habits state
     const updateAllHabits: HabitType[] = allHabits.map((habit) => {
       if (habit._id === updatedHabits._id) {
         return updatedHabits;
@@ -95,11 +111,11 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
   }
 
   useEffect(() => {
-    const isCompleted = singleHabit.completedDays.some(
+    const isCompleted = currentHabit.completedDays.some(
       (day) => day.date === selectedCurrentDate
     );
     setChecked(isCompleted);
-  }, [singleHabit, selectedCurrentDate, allHabits]);
+  }, [currentHabit, selectedCurrentDate, allHabits]);
 
   return (
     <div className="flex p-3 items-center justify-between">
@@ -166,4 +182,26 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
       </div>
     </div>
   );
+}
+
+async function editTheHabitInServer(habit: HabitType) {
+  const response = await fetch(`/api/habits?habitsId=${habit._id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: habit.name,
+      icon: habit.icon,
+      frequency: habit.frequency,
+      notificationTime: habit.notificationTime,
+      isNotificationOn: habit.isNotificationOn,
+      areas: habit.areas,
+      completedDays: habit.completedDays,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to edit habit");
+  }
 }

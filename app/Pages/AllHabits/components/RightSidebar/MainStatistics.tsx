@@ -1,16 +1,87 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell } from "recharts";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
+import { calculateStreak } from "@/app/Pages/Statistics/components/StatisticsBoard";
+import { getCurrentDayName } from "@/app/utils/allHabitUtils/DateFunctions";
+import { HabitType } from "@/app/Types/GlobalTypes";
 
 const MainStatistics = () => {
-  const { darkModeObject } = useGlobalContextProvider();
+  const { darkModeObject, selectedCurrentDayObject } =
+    useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
+  const { selectedCurrentDate } = selectedCurrentDayObject;
 
-  const statisticsInfo = [
+  const [statisticsInfo, setStatisticsInfo] = useState([
     { id: 1, num: 7, subTitle: "Best streaks" },
     { id: 2, num: 10, subTitle: "Perfect Days" },
-  ];
+  ]);
+
+  const [progress, setProgress] = useState<number>(0);
+
+  function calculateThePercentageOfTodaysProgress(
+    allHabits: HabitType[]
+  ): number {
+    //1 get the completed days of the current date
+    //2 get all the habits that need to be done for this current day
+    if (allHabits.length === 0 || !selectedCurrentDate) {
+      return 0;
+    }
+
+    let totalHabitsOfCompletedDays = 0;
+    let totalHabitsOfCurrentDay = 0;
+
+    if (allHabits) {
+      // get the completed days of the current date
+      const completedHabitsOfCurrentDate: HabitType[] = allHabits.filter(
+        (habit) =>
+          habit.completedDays.some((day) => day.date === selectedCurrentDate)
+      );
+
+      totalHabitsOfCompletedDays = completedHabitsOfCurrentDate.length;
+
+      // get all the habits that need to be done for this current day
+      const getTwoLetterOfCurrentDay = getCurrentDayName(
+        selectedCurrentDate
+      ).slice(0, 2);
+
+      const allHabitsOfCurrentDay = allHabits.filter((habit) =>
+        habit.frequency[0].days.some((day) => day === getTwoLetterOfCurrentDay)
+      );
+
+      totalHabitsOfCurrentDay = allHabitsOfCurrentDay.length;
+      const result =
+        (totalHabitsOfCompletedDays / totalHabitsOfCurrentDay) * 100;
+
+      console.log(result);
+
+      if (result === undefined || isNaN(result)) {
+        return 0;
+      }
+      return result ?? 0;
+    }
+
+    return 0;
+  }
+
+  useEffect(() => {
+    setProgress(calculateThePercentageOfTodaysProgress(allHabits));
+  }, [selectedCurrentDate, allHabits]);
+
+  useEffect(() => {
+    //Calculate the total streak
+    //::::::::::::
+    const streaks = allHabits.map((habit) => calculateStreak(habit));
+    const totalStreak = streaks.reduce((a, b) => a + b, 0);
+
+    // calculate tht total perfect days
+    const perfectDays = calculateTotalPerfectDays(allHabits);
+    // Updating the statistics
+    const copyStatsInfo = [...statisticsInfo];
+    copyStatsInfo[0].num = totalStreak;
+    copyStatsInfo[1].num = perfectDays;
+    setStatisticsInfo(copyStatsInfo);
+  }, [allHabits]);
 
   return (
     <div

@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef, SetStateAction } from "react";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { faQuestion } from "@fortawesome/free-solid-svg-icons";
+import { faFlask, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconWindow } from "./IconWindow/IconWindow";
@@ -14,6 +14,8 @@ import { AreaType } from "@/app/Types/GlobalTypes";
 import { HabitType } from "@/app/Types/GlobalTypes";
 import { addNewHabit } from "@/app/utils/allHabitUtils/addNewHabit";
 import toast from "react-hot-toast";
+import { editHabit } from "@/app/utils/allHabitUtils/editHabits";
+import { useUser } from "@clerk/nextjs";
 
 type RepeatOption = {
   name: string;
@@ -26,16 +28,20 @@ type DayOption = {
   isSelected: boolean;
 };
 
-const HabitWindow = () => {
-  const { habitWindowObject, darkModeObject } = useGlobalContextProvider();
+function HabitWindow() {
+  const { habitWindowObject, darkModeObject, selectedItemsObject } =
+    useGlobalContextProvider();
   const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
+  const { selectedItems } = selectedItemsObject;
+  const { user } = useUser();
   //
   const [habitItem, setHabitItem] = useState<HabitType>({
     _id: "",
     name: "",
-    icon: faQuestion,
-    frequency: [{ type: "Daily", days: ["M"], number: 1 }],
+    icon: faFlask,
+    clerkUserId: user?.id || "",
+    frequency: [{ type: "Daily", days: ["Mo"], number: 1 }],
     notificationTime: "",
     isNotificationOn: false,
     areas: [],
@@ -44,6 +50,28 @@ const HabitWindow = () => {
 
   const [openIconWindow, setOpenIconWindow] = useState<boolean>(false);
   const [iconSelected, setIconSelected] = useState<IconProp>(habitItem.icon);
+
+  useEffect(() => {
+    // when the window is closed empty reset the habit item
+    if (!openHabitWindow) {
+      setHabitItem({
+        _id: "",
+        name: "",
+        icon: faFlask,
+        clerkUserId: user?.id || "",
+        frequency: [{ type: "Daily", days: ["Mo"], number: 1 }],
+        notificationTime: "",
+        isNotificationOn: false,
+        areas: [],
+        completedDays: [],
+      });
+    } else {
+      // if the window is opened, we check if there is a selected item
+      if (selectedItems) {
+        setHabitItem(selectedItems as HabitType);
+      }
+    }
+  });
 
   const onUpdateHabitName = (inputText: string) => {
     // creating a shallow copy of the habit item
@@ -139,8 +167,20 @@ const HabitWindow = () => {
         areas: [],
         completedDays: [],
       });
+    } else {
+      // if the window is opened, we check if there is a selected item
+      //
+      if (selectedItems) {
+        setHabitItem(selectedItems as HabitType);
+      }
     }
   }, [openHabitWindow]);
+
+  useEffect(() => {
+    if (selectedItems) {
+      setHabitItem(selectedItems as HabitType);
+    }
+  }, [selectedItems]);
 
   return (
     <div
@@ -152,46 +192,57 @@ const HabitWindow = () => {
         openHabitWindow ? "absolute" : "hidden"
       }`}
     >
+      <TimerPicker onSaveTime={updateReminderTime} />
       <IconWindow
         openIconWindow={openIconWindow}
         setOpenIconWindow={setOpenIconWindow}
         iconSelected={iconSelected}
         setIconSelected={setIconSelected}
       />
-
       <Header />
-
       <InputNameAndIconButton
         onUpdateHabitName={onUpdateHabitName}
         habitName={habitItem.name}
         setOpenIconWindow={setOpenIconWindow}
         iconSelected={iconSelected}
+        setIconSelected={setIconSelected}
       />
       <Repeat
         onChangeOption={changeRepeatOption}
         onChangeDayOption={changeDayOption}
         onChangeWeeksOption={changeWeeksOption}
       />
-
-      <TimerPicker onSaveTime={updateReminderTime} />
-
       <Reminder habitItem={habitItem} setHabitItem={setHabitItem} />
       <HabitWindowArea onChange={getSelectedAreaItems} />
       <SaveButton habit={habitItem} />
     </div>
   );
-};
+}
 
 export default HabitWindow;
 
 function Header() {
-  const { habitWindowObject } = useGlobalContextProvider();
-  const { setOpenHabitWindow } = habitWindowObject;
+  const { habitWindowObject, selectedItemsObject } = useGlobalContextProvider();
+  const { setOpenHabitWindow, openHabitWindow } = habitWindowObject;
+  const { setSelectedItems, selectedItems } = selectedItemsObject;
+  const [header, setHeader] = useState("Add New Habit");
+
+  useEffect(() => {
+    if (selectedItems) {
+      setHeader("Edit Habit");
+    } else {
+      setHeader("Add New Habit");
+    }
+  }, [openHabitWindow, selectedItems]);
+
   return (
     <div className="flex justify-between items-center">
-      <span className="font-bold text-xl"> Add New Habit </span>
+      <span className="font-bold text-xl"> {header} </span>
       <FontAwesomeIcon
-        onClick={() => setOpenHabitWindow(false)}
+        onClick={() => {
+          setOpenHabitWindow(false);
+          setSelectedItems(null);
+        }}
         className="text-gray-400 cursor-pointer"
         icon={faClose}
       />
@@ -204,16 +255,20 @@ function InputNameAndIconButton({
   habitName,
   setOpenIconWindow,
   iconSelected,
+  setIconSelected,
 }: {
   onUpdateHabitName: (inputText: string) => void;
   habitName: string;
   setOpenIconWindow: React.Dispatch<React.SetStateAction<boolean>>;
   iconSelected: IconProp;
+  setIconSelected: React.Dispatch<React.SetStateAction<IconProp>>;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const { habitWindowObject, darkModeObject } = useGlobalContextProvider();
+  const { habitWindowObject, darkModeObject, selectedItemsObject } =
+    useGlobalContextProvider();
   const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
+  const { selectedItems, setSelectedItems } = selectedItemsObject;
 
   function updateInputHabit(event: React.ChangeEvent<HTMLInputElement>) {
     onUpdateHabitName(event.target.value);
@@ -224,9 +279,14 @@ function InputNameAndIconButton({
       inputRef.current?.focus();
     }, 500);
 
-    //
+    // when the window is closed empty the input field by using the callback function
     if (!openHabitWindow) {
       onUpdateHabitName("");
+    } else {
+      if (selectedItems) {
+        onUpdateHabitName(selectedItems.name);
+        setIconSelected(selectedItems.icon);
+      }
     }
   }, [openHabitWindow]);
 
@@ -286,7 +346,10 @@ function Repeat({
 
   const [allDays, setAllDays] = useState<DayOption[]>(days);
   const [weeks, setWeeks] = useState(1);
-  const { darkModeObject } = useGlobalContextProvider();
+  const { darkModeObject, selectedItemsObject, habitWindowObject } =
+    useGlobalContextProvider();
+  const { selectedItems } = selectedItemsObject;
+  const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
   const [nameOfSelectedOption, setNameOfSelectedOption] = useState("");
 
@@ -314,6 +377,45 @@ function Repeat({
   }, [weeks]);
 
   // This useEffect get the name of selection option and update it in the nameOfSelectedOption variable
+  useEffect(() => {
+    if (!openHabitWindow) {
+      const getNameOptionSelected = repeatOptions.filter(
+        (singleOption) => singleOption.isSelected
+      )[0].name;
+
+      setNameOfSelectedOption(getNameOptionSelected);
+    }
+
+    // if the selected items is not null, it means that we are going to edit the habit
+    if (selectedItems) {
+      // Assert the type of selectedItems
+      const currentHabitSelected = selectedItems as HabitType;
+      // Get the name of the selected option
+      const selectedOptionOfHabitSelected =
+        currentHabitSelected.frequency[0].type;
+      // Update the name of the selectedOption based on the selectedOption
+      const copyRepeatOptions = repeatOptions.map((singleOption) => {
+        if (singleOption.name === selectedOptionOfHabitSelected) {
+          return { ...singleOption, isSelected: true };
+        }
+        return { ...singleOption, isSelected: false };
+      });
+      //Update the repeatOptions Array
+      setRepeatOptions(copyRepeatOptions);
+    } else {
+      // if the selectedItems is null, it means we are going to create a new habit
+      // set both items as false in the repeated options
+      const copyRepeatOptions = repeatOptions.map((singleOption) => {
+        return { ...singleOption, isSelected: false };
+      });
+
+      // set the first option as selected
+      copyRepeatOptions[0].isSelected = true;
+      //Update the first repeatOptions array
+      setRepeatOptions(copyRepeatOptions);
+    }
+  }, [openHabitWindow]);
+
   useEffect(() => {
     const getNameOptionSelected = repeatOptions.filter(
       (singleOption) => singleOption.isSelected
@@ -364,9 +466,11 @@ function DailyOptions({
   allDays: DayOption[];
   setAllDays: React.Dispatch<React.SetStateAction<DayOption[]>>;
 }) {
-  const { darkModeObject, habitWindowObject } = useGlobalContextProvider();
+  const { darkModeObject, habitWindowObject, selectedItemsObject } =
+    useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
   const { openHabitWindow } = habitWindowObject;
+  const { selectedItems } = selectedItemsObject;
 
   function selectedDays(singleDayIndex: number) {
     const selectedCount: number = allDays.filter(
@@ -392,12 +496,27 @@ function DailyOptions({
 
   useEffect(() => {
     if (openHabitWindow) {
-      const updateSelectedDays = allDays.map((singleDay) => {
-        return { ...singleDay, isSelected: false };
-      });
-
-      updateSelectedDays[0].isSelected = true;
-      setAllDays(updateSelectedDays);
+      if (!selectedItems) {
+        const updateSelectedDays = allDays.map((singleDay) => {
+          return { ...singleDay, isSelected: false };
+        });
+        updateSelectedDays[0].isSelected = true;
+        setAllDays(updateSelectedDays);
+      } else {
+        const currentHabitSelected = selectedItems as HabitType;
+        //
+        const selectedOptionsHabitSelected =
+          currentHabitSelected.frequency[0].days;
+        //
+        const updateSelectedDays = allDays.map((singleDay) => {
+          if (selectedOptionsHabitSelected) {
+            return { ...singleDay, isSelected: true };
+          } else {
+            return { ...singleDay, isSelected: false };
+          }
+        });
+        setAllDays(updateSelectedDays);
+      }
     }
   }, [openHabitWindow]);
 
@@ -497,9 +616,16 @@ function Reminder({
   habitItem: HabitType;
   setHabitItem: React.Dispatch<React.SetStateAction<HabitType>>;
 }) {
-  const { darkModeObject, openTimePickerObject } = useGlobalContextProvider();
+  const {
+    darkModeObject,
+    openTimePickerObject,
+    habitWindowObject,
+    selectedItemsObject,
+  } = useGlobalContextProvider();
   const { setOpenTimePickerWindow } = openTimePickerObject;
   const { isDarkMode } = darkModeObject;
+  const { selectedItems } = selectedItemsObject;
+  const { openHabitWindow } = habitWindowObject;
 
   const [isOn, setIsOn] = useState(false);
 
@@ -512,8 +638,24 @@ function Reminder({
 
   function openTheTimerPicker() {
     setOpenTimePickerWindow(true);
-    console.log("TimePicker should open now!");
   }
+
+  //////////   if there is a selected Items
+  ////////////////// 1. get the selected habit
+  ////////////////// 2. check if notification is on
+  ////////////////// 3. set the isOn state
+  ////////////////// 4. update the UI
+  ///// IF THERE IS NO SELECTED ITEMS, SET THE isOn STATE TO FALSE
+
+  useEffect(() => {
+    if (selectedItems) {
+      const currentHabitSelected = selectedItems as HabitType;
+      const { isNotificationOn } = currentHabitSelected;
+      setIsOn(isNotificationOn);
+    } else {
+      setIsOn(false);
+    }
+  }, [openHabitWindow]);
 
   return (
     <div className="flex flex-col gap-2 mt-20 px-3">
@@ -573,40 +715,44 @@ function SaveButton({ habit }: { habit: HabitType }) {
     useGlobalContextProvider();
   const { allHabits, setAllHabits } = allHabitsObject;
   const { openHabitWindow, setOpenHabitWindow } = habitWindowObject;
-  const { selectedItems } = selectedItemsObject;
+  const { selectedItems, setSelectedItems } = selectedItemsObject;
   const [buttonText, setButtonText] = useState("Add a Habit");
 
   useEffect(() => {
-    selectedItems ? setButtonText("Edit Habit") : setButtonText("Add a Habit");
-  }, [openHabitWindow]);
-
-  function checkNewHabitObject() {
-    if (habit.name.trim() === "") {
-      return toast.error("the habit name filed is still empty");
-    }
-    const habitExist = allHabits.some(
-      (singleHabit) => singleHabit.name === habit.name
-    );
-
-    if (!habitExist) {
-      try {
-        setAllHabits([...allHabits, habit]);
-        toast.success("Habit already exist");
-      } catch (error) {
-        console.log("wrong");
-        toast.error("Habit already exist");
-      }
-      addNewHabit({ allHabits, setAllHabits, newHabit: habit });
-      setOpenHabitWindow(false);
+    if (selectedItems) {
+      setButtonText("Edit Habit");
     } else {
-      toast.error("Habit already exist");
+      setButtonText("Add New Habit");
+    }
+  }, [openHabitWindow, selectedItems]);
+
+  function checkHabitObject() {
+    if (!selectedItems) {
+      if (habit.name.trim() === "") {
+        return toast.error("the habit name filed is still empty");
+      }
+
+      const habitExist = allHabits.some(
+        (singleHabit) => singleHabit.name === habit.name
+      );
+
+      if (!habitExist) {
+        addNewHabit({ allHabits, setAllHabits, habit });
+        setOpenHabitWindow(false);
+      } else {
+        editHabit({ allHabits, setAllHabits, habit, selectedItems });
+        //close the window
+        setOpenHabitWindow(false);
+      }
+
+      setSelectedItems(null);
     }
   }
 
   return (
     <div className="w-full flex justify-center mt-9 bg-blue-600 shadow-2xl rounded-md">
-      <button onClick={checkNewHabitObject} className="p-4 w-full text-white">
-        Add a Habit
+      <button onClick={checkHabitObject} className="p-4 w-full text-white">
+        {buttonText}
       </button>
     </div>
   );

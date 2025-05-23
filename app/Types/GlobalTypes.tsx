@@ -3,7 +3,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 export type AreaType = {
   _id: string;
   name: string;
-  icon: IconProp;
+  icon: any;
 };
 
 type FrequencyType = {
@@ -12,15 +12,16 @@ type FrequencyType = {
   number: number;
 };
 
-export type CompletedDays = {
+type CompletedDays = {
   date: string;
-  _id: string;
+  _id?: string;
 };
 
 export type HabitType = {
-  _id: string;
+  _id?: string;
   name: string;
   icon: IconProp;
+  clerkUserId: string;
   frequency: FrequencyType[];
   notificationTime: string;
   isNotificationOn: boolean;
