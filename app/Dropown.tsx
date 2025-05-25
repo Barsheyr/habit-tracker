@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { HabitType, AreaType } from "./Types/GlobalTypes";
 
 interface dropMenuItem {
   name: string;
@@ -42,11 +43,25 @@ export function Dropdown() {
     setHover(state);
   }
 
+  // Creating the typeGuards to check if the selectedItems is of type AreaType or HabitType
+  function isAreaType(item: any): item is AreaType {
+    return "name" in item && "icon" in item && !("frequency" in item);
+  }
+
+  function isHabitType(item: any): item is HabitType {
+    return "frequency" in item && "notificationTime" in item;
+  }
+
   function handleClickOption(index: number) {
     switch (index) {
       //Edit Option
       case 0:
-        setOpenHabitWindow(true);
+        if (isHabitType(selectedItems)) {
+          setOpenConfirmationWindow(true);
+        } else if (isAreaType(selectedItems)) {
+          console.log("edit area");
+        }
+
         setOpenDropdown(false);
         break;
       //Delete Option

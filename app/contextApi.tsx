@@ -18,6 +18,7 @@ import {
   faLayerGroup,
   faMoon,
   faSun,
+  faFlask,
 } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { getDateString } from "./utils/allHabitUtils/DateFunctions";
@@ -88,6 +89,16 @@ const GlobalContext = createContext<GlobalContextType>({
     selectedItems: null,
     setSelectedItems: () => {},
   },
+  openAreaFormObject: {
+    openAreaForm: false,
+    setOpenAreaForm: () => {},
+  },
+  openIconWindowObject: {
+    openIconWindow: false,
+    setOpenIconWindow: () => {},
+    iconSelected: faFlask,
+    setIconSelected: () => {},
+  },
 });
 
 function GlobalContextProvider({ children }: { children: ReactNode }) {
@@ -127,37 +138,52 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
   >(null);
 
   const { isLoaded, isSignedIn, user } = useUser();
+  const [openAreaForm, setOpenAreaForm] = useState(false);
+  const [openIconWindow, setOpenIconWindow] = useState(false);
+  const [iconSelected, setIconSelected] = useState<IconProp>(faFlask);
 
   useEffect(() => {
-    function fetchData() {
-      const allHabitsData: HabitType[] = [
-        {
-          _id: uuidv4(),
-          name: "habit 1",
-          icon: textToIcon("faTools") as IconProp,
-          clerkUserId: user?.id || "",
-          frequency: [{ type: "Daily", days: ["Mo", "Sa"], number: 1 }],
-          notificationTime: "",
-          isNotificationOn: false,
-          areas: [
-            {
-              _id: uuidv4(),
-              icon: textToIcon("faGraduationCap"),
-              name: "Study",
-            },
-            { _id: uuidv4(), icon: textToIcon("faCode"), name: "Code" },
-          ],
-          completedDays: [
-            { _id: uuidv4(), date: "03/06/2024" },
-            { _id: uuidv4(), date: "03/07/2024" },
-          ],
-        },
-      ];
+    const fetchAllHabits = async () => {
+      try {
+        const response = await fetch(`/api/habits?clerk=${user?.id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch habits");
+        }
+        const data: { habits: HabitType[] } = await response.json();
 
-      setTimeout(() => {
-        setAllHabits(allHabitsData);
-      }, 1000);
-    }
+        // Convert the icon of the habit from string to IconProp
+        const updatedHabits = data.habits.map((habit: HabitType) => {
+          if (typeof habit.icon === "string") {
+            return {
+              ...habit,
+              icon: textToIcon(habit.icon) as IconProp,
+            };
+          }
+          return habit;
+        });
+
+        // update the icons
+        const updatedHabitsWithAreas = updatedHabits.map((habit: HabitType) => {
+          const updatedAreas = habit.areas.map((area: AreaType) => {
+            if (typeof area.icon === "string") {
+              return {
+                ...area,
+                icon: textToIcon(area.icon) as IconProp,
+              };
+            }
+            return area;
+          });
+          return { ...habit, areas: updatedAreas };
+        });
+
+        // Update the habits array with the updated icons
+        console.log(updatedHabitsWithAreas);
+
+        setAllHabits(updatedHabitsWithAreas);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
 
     function fetchAllAreas() {
       const allAreasData: AreaType[] = [
@@ -169,13 +195,20 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
       setAllAreas(allAreasData);
     }
 
-    fetchData();
+    if (isLoaded && isSignedIn) {
+      fetchAllHabits();
+    }
+
     fetchAllAreas();
-  }, [isSignedIn, isLoaded]);
+  }, [isSignedIn, isLoaded, user?.id]);
 
   //Each time the menu items are updated, the sidebar is closed
   useEffect(() => {
     setOpenSideBar(false);
+    setOpenConfirmationWindow(false);
+    setOpenHabitWindow(false);
+    setOpenAreaForm(false);
+    setOpenIconWindow(false);
   }, [menuItems]);
 
   return (
@@ -236,6 +269,10 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
         selectedItemsObject: {
           selectedItems,
           setSelectedItems,
+        },
+        openAreaFormObject: {
+          openAreaForm,
+          setOpenAreaForm,
         },
       }}
     >

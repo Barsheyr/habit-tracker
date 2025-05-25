@@ -1,36 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
+import DataForModal from "@/Modal";
+import AllAreaContainer from "./Components/AllAreaContainer";
+import AllAreasTopBar from "./Components/AllAreasTopBar";
+import Dropdown from "@/app/Dropown";
+import { ConfirmationWindow } from "@/app/CofirmationWindow";
 
 const Areas = () => {
   return (
-    <div>
-      <div className="w-full flex">
-        <div className="w-[80%] m-5">
-          <AllAreasTopBar />
-        </div>
-
-        <RightSideBar />
-      </div>
+    <div className="w-full h-screen p-3 relative">
+      <AllAreasTopBar />
+      <AllAreaContainer />
+      <Dropdown />
+      <ConfirmationWindow />
     </div>
   );
 };
 
 export default Areas;
-
-function AllAreasTopBar() {
-  return (
-    <div className="bg-white p-5 rounded-md FLEX justify-between">
-      <div className="flex flex-col">
-        <span className="text-xl">
-          <span className="font-bold"> Hi There </span>
-          <span className=" font-light"> Ali </span>
-        </span>
-
-        <span className="font-light text-[12px] text-gray-400">
-          welcome back!!
-        </span>
-      </div>
-    </div>
-  );
-}
-
-function RightSideBar() {}

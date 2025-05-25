@@ -73,4 +73,8 @@ export type GlobalContextType = {
     selectedItems: HabitType | AreaType | null;
     setSelectedItems: Dispatch<SetStateAction<HabitType | AreaType | null>>;
   };
+  openAreaFormObject: {
+    openAreaForm: boolean;
+    setOpenAreaForm: Dispatch<SetStateAction<boolean>>;
+  };
 };
