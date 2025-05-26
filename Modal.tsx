@@ -11,6 +11,7 @@ interface DataFormModalProps {
   isOpen: boolean;
   FormTitle: string;
   className?: string;
+  textValue?: string;
   onClose: () => void;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onClick?: () => void;
@@ -19,6 +20,7 @@ interface DataFormModalProps {
 export default function DataFormModal({
   FormTitle,
   className = "",
+  textValue,
   isOpen,
   onClose,
   onChange,
@@ -51,6 +53,7 @@ export default function DataFormModal({
               inputlabel="Area Name"
               placeholder="Type a name for the area..."
               onChange={onChange}
+              value={textValue}
             />
           </div>
 

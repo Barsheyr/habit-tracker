@@ -19,6 +19,7 @@ export default function InputName({
   const {
     darkModeObject: { isDarkMode },
     openAreaFormObject: { openAreaForm },
+    openIconWindowObject: { setOpenIconWindow, iconSelected },
   } = useGlobalContextProvider();
 
   const inputRef = useRef<HTMLImageElement>(null);
@@ -45,7 +46,8 @@ export default function InputName({
           className="bg-mainColor mt-[1px] p-4 rounded-md text-white cursor-pointer bg-blue-500"
           height={16}
           width={16}
-          icon={faFlag}
+          icon={iconSelected}
+          onClick={() => setOpenIconWindow(true)}
         />
       </div>
     </div>

@@ -2,6 +2,7 @@ import { menuItemType } from "./MenuItemTypes";
 import { Dispatch, SetStateAction } from "react";
 import { DarkModeItem } from "./DarkModeTypes";
 import { AreaType, HabitType } from "./GlobalTypes";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export type GlobalContextType = {
   menuItemsObject: {
@@ -76,5 +77,12 @@ export type GlobalContextType = {
   openAreaFormObject: {
     openAreaForm: boolean;
     setOpenAreaForm: Dispatch<SetStateAction<boolean>>;
+  };
+
+  openIconWindowObject: {
+    openIconWindow: boolean;
+    setOpenIconWindow: Dispatch<SetStateAction<boolean>>;
+    iconSelected: IconProp;
+    setIconSelected: Dispatch<SetStateAction<boolean>>;
   };
 };

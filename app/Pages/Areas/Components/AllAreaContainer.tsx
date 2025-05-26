@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { faStairs } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconButton } from "@mui/material";
@@ -9,25 +9,85 @@ import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import Dropdown from "@/app/Dropown";
 import DataFormModal from "@/Modal";
+import addNewArea from "@/app/utils/allAreasUtils/addNewArea";
+import toast from "react-hot-toast";
 
 const AllAreaContainer = () => {
   const {
-    allAreasObject: { allAreas },
+    allAreasObject: { allAreas, setAllAreas },
     darkModeObject: { isDarkMode },
     openAreaFormObject: { openAreaForm, setOpenAreaForm },
+    selectedItemsObject: { selectedItems },
+    openIconWindowObject: { setOpenIconWindow, iconSelected },
   } = useGlobalContextProvider();
+
+  const [areaItem, setAreaItem] = useState<AreaType>({
+    _id: "",
+    name: "",
+    icon: faFlask,
+  });
 
   function handleOnClose() {
     setOpenAreaForm(!openAreaForm);
   }
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
-    console.log(event.target.value);
+    setAreaItem({
+      ...areaItem,
+      name: event.target.value,
+    });
   }
 
   function handleOnClick() {
-    console.log("clicked");
+    if (!selectedItems) {
+      /// check if the area name is not empty
+      if (areaItem.name.trim() === "") {
+        return toast.error("The area name filed is still empty");
+      }
+
+      // check of there's no area
+      const areaExist = allAreas.some(
+        (singleArea) =>
+          singleArea.name.toLocaleLowerCase() ===
+          areaItem.name.toLocaleLowerCase()
+      );
+      if (areaExist) {
+        toast.error("The area already exists");
+        return;
+      }
+
+      try {
+        addNewArea({ allAreas, setAllAreas, areaItem });
+        setOpenAreaForm(false);
+      } catch (error) {
+        console.log(error);
+      }
+    }
   }
+
+  useEffect(() => {
+    // when the form is closed reset the area item
+    if (!openAreaForm) {
+      setAreaItem((prevAreaItem) => ({
+        ...prevAreaItem,
+        name: "",
+      }));
+      return;
+    }
+    // Generate a new Id when it is opened
+    setAreaItem({
+      ...areaItem,
+      _id: uuidv4(),
+    });
+  }, [openAreaForm]);
+
+  // change the icon property of the area
+  useEffect(() => {
+    setAreaItem({
+      ...areaItem,
+      icon: iconSelected,
+    });
+  }, [iconSelected]);
 
   return (
     <div
@@ -45,6 +105,7 @@ const AllAreaContainer = () => {
         onChange={handleOnChange}
         FormTitle="Add New Title"
         onClick={handleOnClick}
+        textValue={areaItem.name}
       />
       {allAreas.map((singleArea, index) => (
         <div key={index}>

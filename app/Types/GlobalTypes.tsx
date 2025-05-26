@@ -1,8 +1,9 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export type AreaType = {
-  _id: string;
+  _id?: string;
   name: string;
+  clerkUserId: string;
   icon: any;
 };
 
@@ -20,7 +21,7 @@ type CompletedDays = {
 export type HabitType = {
   _id?: string;
   name: string;
-  icon: IconProp;
+  icon: any;
   clerkUserId: string;
   frequency: FrequencyType[];
   notificationTime: string;

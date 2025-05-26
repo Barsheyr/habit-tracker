@@ -4,10 +4,27 @@ import AllAreaContainer from "./Components/AllAreaContainer";
 import AllAreasTopBar from "./Components/AllAreasTopBar";
 import Dropdown from "@/app/Dropown";
 import { ConfirmationWindow } from "@/app/CofirmationWindow";
+import { useGlobalContextProvider } from "@/app/contextApi";
+import { IconWindow } from "../AllHabits/components/IconWindow/IconWindow";
 
 const Areas = () => {
+  const {
+    openIconWindowObject: {
+      openIconWindow,
+      setOpenIconWindow,
+      iconSelected,
+      setIconSelected,
+    },
+  } = useGlobalContextProvider();
+
   return (
     <div className="w-full h-screen p-3 relative">
+      <IconWindow
+        openIconWindow={openIconWindow}
+        setIconSelected={setIconSelected}
+        setOpenIconWindow={setOpenIconWindow}
+        iconSelected={iconSelected}
+      />
       <AllAreasTopBar />
       <AllAreaContainer />
       <Dropdown />

@@ -11,7 +11,10 @@ import { GlobalContextType } from "./Types/GlobalContextTypes";
 import { menuItemType } from "./Types/MenuItemTypes";
 import { DarkModeItem } from "./Types/DarkModeTypes";
 import { AreaType, HabitType } from "./Types/GlobalTypes";
-import { textToIcon } from "@/app/Pages/AllHabits/components/IconWindow/IconData";
+import {
+  iconToText,
+  textToIcon,
+} from "@/app/Pages/AllHabits/components/IconWindow/IconData";
 import {
   faChartSimple,
   faRectangleList,
@@ -19,10 +22,11 @@ import {
   faMoon,
   faSun,
   faFlask,
+  faGlobe,
 } from "@fortawesome/free-solid-svg-icons";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { getDateString } from "./utils/allHabitUtils/DateFunctions";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 import { useUser } from "@clerk/nextjs";
 
 const GlobalContext = createContext<GlobalContextType>({
@@ -185,22 +189,87 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    function fetchAllAreas() {
-      const allAreasData: AreaType[] = [
-        { _id: uuidv4(), icon: textToIcon("faGlobe"), name: "All" },
-        { _id: uuidv4(), icon: textToIcon("faBook"), name: "Study" },
-        { _id: uuidv4(), icon: textToIcon("faLaptopCode"), name: "Code" },
-      ];
+    async function fetchAllAreas() {
+      try {
+        const response = await fetch(`/api/areas?clerkId=${user?.id}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch areas");
+        }
 
-      setAllAreas(allAreasData);
+        const data: { areas: AreaType[] } = await response.json();
+
+        // create the all area if the user has no area
+
+        if (data.areas.length === 0) {
+          const allArea = await addTheAllAreas();
+          // Convert the icon of the area from string
+          if (typeof allArea?.icon === "string") {
+            const updatedArea = {
+              ...allArea,
+              icon: textToIcon(allArea.icon) as IconProp,
+            };
+
+            setAllAreas([updatedArea]);
+          }
+
+          return;
+        }
+
+        // convert the icons property
+        const updatedAreas = data.areas.map((area: AreaType) => {
+          if (typeof area.icon === "string") {
+            return {
+              ...area,
+              icon: textToIcon(area.icon) as IconProp,
+            };
+          }
+          return area;
+        });
+        setAllAreas(updatedAreas);
+      } catch (error) {
+        console.log(error);
+      }
     }
 
     if (isLoaded && isSignedIn) {
       fetchAllHabits();
+      fetchAllAreas();
     }
 
     fetchAllAreas();
   }, [isSignedIn, isLoaded, user?.id]);
+
+  async function addTheAllAreas() {
+    const allArea = {
+      icon: iconToText(faGlobe),
+      name: "All",
+      clerkUserId: user?.id as string,
+    };
+
+    try {
+      const response = await fetch("/api/areas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify(allArea),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add an area");
+      }
+
+      const data = await response.json();
+      const { _id } = data.area;
+      // update the _id of the area
+      const updatedIdOfArea = { ...allArea, _id: _id };
+
+      return updatedIdOfArea;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   //Each time the menu items are updated, the sidebar is closed
   useEffect(() => {
@@ -273,6 +342,12 @@ function GlobalContextProvider({ children }: { children: ReactNode }) {
         openAreaFormObject: {
           openAreaForm,
           setOpenAreaForm,
+        },
+        openIconWindowObject: {
+          openIconWindow,
+          setOpenIconWindow,
+          iconSelected,
+          setIconSelected,
         },
       }}
     >
