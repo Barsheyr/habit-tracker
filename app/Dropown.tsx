@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect, useRef } from "react";
 import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,6 +20,7 @@ export function Dropdown() {
     openConfirmationWindowObject,
     selectedItemsObject,
     habitWindowObject,
+    openAreaFormObject,
   } = useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
   const { openDropdown, setOpenDropdown } = openDropDownObject;
@@ -27,6 +29,7 @@ export function Dropdown() {
     openConfirmationWindowObject;
   const { setSelectedItems, selectedItems } = selectedItemsObject;
   const { setOpenHabitWindow, openHabitWindow } = habitWindowObject;
+  const { openAreaForm, setOpenAreaForm } = openAreaFormObject;
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -48,6 +51,7 @@ export function Dropdown() {
     return "name" in item && "icon" in item && !("frequency" in item);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   function isHabitType(item: any): item is HabitType {
     return "frequency" in item && "notificationTime" in item;
   }
@@ -79,7 +83,7 @@ export function Dropdown() {
       if (ref && !ref.current?.contains(event.target as Node)) {
         setOpenDropdown(false);
 
-        if (!openConfirmationWindow && !openHabitWindow) {
+        if (!openConfirmationWindow && !openHabitWindow && !openAreaForm) {
           setSelectedItems(null);
         }
       }

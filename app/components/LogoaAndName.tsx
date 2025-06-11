@@ -14,7 +14,6 @@ const LogoaAndName = () => {
           >
             Arsheyr
           </div>
-          <span className="font-bold text-blue-200"> Habit </span>
           <span className="font-light"> Tracker </span>
         </span>
       </div>

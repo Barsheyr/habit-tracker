@@ -41,21 +41,31 @@ export async function addNewHabit({
       body: JSON.stringify(updatedHabit),
     });
 
-    if (!response) {
-      throw new Error("Failed to add habit");
+    if (!response.ok) {
+      throw new Error(`Failed to add habit`);
     }
     //extract
-    const { data } = await response.json();
+    const data = await response.json();
+    // console.log("Habit POST response data:", data);
+
+    // if (!data.habit) {
+    //   throw new Error("No habit returned from server");
+    // }
+
     const { _id } = data.habit;
+
     // update the _id from the response
-    const updatedIdOfHabit = { ...habit, _id: _id };
+    const updatedIdOfHabit = {
+      ...habit,
+      _id: _id,
+      icon: habitIconText,
+      areas: areaCopy,
+    };
+
     // add the updated habit to the allHabits array
     setAllHabits([...allHabits, updatedIdOfHabit]);
 
     if (updatedIdOfHabit.isNotificationOn) {
-      //notification: "09:49 PM"
-      //days ["Mo", "We", "Su"]
-
       scheduleNotifications(
         updatedHabit.notificationTime,
         updatedHabit.frequency[0].days,
@@ -66,5 +76,6 @@ export async function addNewHabit({
   } catch (error) {
     console.error(error); // Now it's used
     toast.error("Something went wrong!...");
+    throw error;
   }
 }

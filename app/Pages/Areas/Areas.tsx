@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React from "react";
 import DataForModal from "@/Modal";
 import AllAreaContainer from "./Components/AllAreaContainer";
 import AllAreasTopBar from "./Components/AllAreasTopBar";
 import Dropdown from "@/app/Dropown";
 import { ConfirmationWindow } from "@/app/CofirmationWindow";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { IconWindow } from "../AllHabits/components/IconWindow/IconWindow";
+import IconsWindow from "../AllHabits/components/IconWindow/IconWindow";
 
 const Areas = () => {
   const {
@@ -19,7 +19,7 @@ const Areas = () => {
 
   return (
     <div className="w-full h-screen p-3 relative">
-      <IconWindow
+      <IconsWindow
         openIconWindow={openIconWindow}
         setIconSelected={setIconSelected}
         setOpenIconWindow={setOpenIconWindow}

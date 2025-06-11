@@ -1,34 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { faStairs } from "@fortawesome/free-solid-svg-icons";
+import { faFlask } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconButton } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { AreaType } from "@/app/Types/GlobalTypes";
-import { textToIcon } from "../../AllHabits/components/IconWindow/IconData";
+// import { textToIcon } from "../../AllHabits/components/IconWindow/IconData";
 import { darkModeColor, defaultColor } from "@/colors";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import Dropdown from "@/app/Dropown";
 import DataFormModal from "@/Modal";
 import addNewArea from "@/app/utils/allAreasUtils/addNewArea";
 import toast from "react-hot-toast";
+import { useUser } from "@clerk/nextjs";
 
 const AllAreaContainer = () => {
   const {
     allAreasObject: { allAreas, setAllAreas },
     darkModeObject: { isDarkMode },
     openAreaFormObject: { openAreaForm, setOpenAreaForm },
-    selectedItemsObject: { selectedItems },
-    openIconWindowObject: { setOpenIconWindow, iconSelected },
+    selectedItemsObject: { selectedItems, setSelectedItems },
+    openIconWindowObject: { iconSelected },
   } = useGlobalContextProvider();
+
+  const { user } = useUser();
 
   const [areaItem, setAreaItem] = useState<AreaType>({
     _id: "",
     name: "",
     icon: faFlask,
+    clerkUserId: "",
   });
 
   function handleOnClose() {
     setOpenAreaForm(!openAreaForm);
+    setSelectedItems(null);
   }
 
   function handleOnChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -73,12 +78,18 @@ const AllAreaContainer = () => {
         name: "",
       }));
       return;
+    } else {
+      if (!selectedItems) {
+        // Generate a new Id when it is opened
+        setAreaItem({
+          ...areaItem,
+          _id: "",
+          clerkUserId: user?.id as string,
+        });
+      } else {
+        setAreaItem(selectedItems);
+      }
     }
-    // Generate a new Id when it is opened
-    setAreaItem({
-      ...areaItem,
-      _id: uuidv4(),
-    });
   }, [openAreaForm]);
 
   // change the icon property of the area
@@ -103,7 +114,7 @@ const AllAreaContainer = () => {
         isOpen={openAreaForm}
         onClose={handleOnClose}
         onChange={handleOnChange}
-        FormTitle="Add New Title"
+        FormTitle={selectedItems ? "Edit Area" : "Add Area"}
         onClick={handleOnClick}
         textValue={areaItem.name}
       />
@@ -121,7 +132,7 @@ export default AllAreaContainer;
 function AreaCard({ singleArea }: { singleArea: AreaType }) {
   const {
     darkModeObject: { isDarkMode },
-    openDropDownObject: { openDropdown, setOpenDropdown },
+    openDropDownObject: { setOpenDropdown },
     dropDownPositionObject: { setDropDownPositions },
     selectedItemsObject: { setSelectedItems },
   } = useGlobalContextProvider();

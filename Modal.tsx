@@ -1,11 +1,11 @@
 import React from "react";
-import { Input } from "postcss";
+// import { Input } from "postcss";
 import Button from "./app/Button";
 import InputName from "./InputName";
 import { useGlobalContextProvider } from "./app/contextApi";
 import { darkModeColor, defaultColor } from "./colors";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlag } from "@fortawesome/free-solid-svg-icons";
+// import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+// import { faFlag } from "@fortawesome/free-solid-svg-icons";
 
 interface DataFormModalProps {
   isOpen: boolean;
@@ -48,6 +48,7 @@ export default function DataFormModal({
           className={`${defaultClasses} ${className}`}
         >
           <Header FormTitle={FormTitle} onClose={onClose} />
+
           <div className="w-full">
             <InputName
               inputlabel="Area Name"
@@ -61,7 +62,7 @@ export default function DataFormModal({
             onClick={onClick}
             className="bg-blue-500 text-white mt-10 p-3 px-6"
           >
-            Add New Area
+            {FormTitle === "Add Area" ? "Add Area" : "Edit Area"}
           </Button>
         </div>
       )}

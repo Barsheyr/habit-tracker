@@ -10,6 +10,6 @@ const AreaSchema = new Schema({
 
 // Check if the model already exists
 
-const Area = models.area || model("Area", AreaSchema);
+const Area = models.Area || model("Area", AreaSchema);
 
 export default Area;

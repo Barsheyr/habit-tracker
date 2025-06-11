@@ -7,10 +7,11 @@ import { getCurrentDayName } from "@/app/utils/allHabitUtils/DateFunctions";
 import { HabitType } from "@/app/Types/GlobalTypes";
 
 const MainStatistics = () => {
-  const { darkModeObject, selectedCurrentDayObject } =
+  const { darkModeObject, selectedCurrentDayObject, allHabitsObject } =
     useGlobalContextProvider();
   const { isDarkMode } = darkModeObject;
   const { selectedCurrentDate } = selectedCurrentDayObject;
+  const { allHabits } = allHabitsObject;
 
   const [statisticsInfo, setStatisticsInfo] = useState([
     { id: 1, num: 7, subTitle: "Best streaks" },
@@ -74,12 +75,12 @@ const MainStatistics = () => {
     const streaks = allHabits.map((habit) => calculateStreak(habit));
     const totalStreak = streaks.reduce((a, b) => a + b, 0);
 
-    // calculate tht total perfect days
-    const perfectDays = calculateTotalPerfectDays(allHabits);
+    // // calculate tht total perfect days
+    // const perfectDays = calculateTotalPerfectDays(allHabits);
     // Updating the statistics
     const copyStatsInfo = [...statisticsInfo];
     copyStatsInfo[0].num = totalStreak;
-    copyStatsInfo[1].num = perfectDays;
+    // copyStatsInfo[1].num = perfectDays;
     setStatisticsInfo(copyStatsInfo);
   }, [allHabits]);
 
@@ -101,7 +102,7 @@ const MainStatistics = () => {
         <CircularProgressBar progress={89} />
         <div className="flex flex-col justify-center items-center absolute top-[54%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
           <span className="font-bold text-xl text-blue-500"> 89% </span>
-          <span className="text-[11px] "> {`Today's Progress`} </span>
+          <span className="text-[11px] "> {progress} </span>
         </div>
       </div>
 

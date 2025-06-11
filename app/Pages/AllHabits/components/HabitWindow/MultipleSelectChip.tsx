@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from "react";
 import { useState } from "react";
 import { Theme, useTheme } from "@mui/material/styles";
@@ -9,7 +10,7 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import Chip from "@mui/material/Chip";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { AreaType, HabitType } from "@/app/Types/GlobalTypes";
+import { HabitType } from "@/app/Types/GlobalTypes";
 import { darkModeColor, defaultColor } from "@/colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 

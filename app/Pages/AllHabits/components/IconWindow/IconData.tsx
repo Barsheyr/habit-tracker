@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import {
   faCalculator,

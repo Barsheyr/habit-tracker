@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import connectToDB from "@/app/lib/connectToDB";
 import HabitsCollection from "@/app/Models/HabitSchema";
-import { Error } from "mongoose";
+// import { Error } from "mongoose";
 
 export async function POST(req: Request) {
   try {
@@ -12,10 +13,11 @@ export async function POST(req: Request) {
       frequency,
       notificationTime,
       isNotificationOn,
+      areas,
       completedDays,
     } = await req.json();
 
-    await connectToDB;
+    await connectToDB();
 
     const habit = new HabitsCollection({
       name,
@@ -24,6 +26,7 @@ export async function POST(req: Request) {
       clerkUserId,
       notificationTime,
       isNotificationOn,
+      areas,
       completedDays,
     });
     const savedHabit = await habit.save();

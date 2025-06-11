@@ -83,6 +83,6 @@ export type GlobalContextType = {
     openIconWindow: boolean;
     setOpenIconWindow: Dispatch<SetStateAction<boolean>>;
     iconSelected: IconProp;
-    setIconSelected: Dispatch<SetStateAction<boolean>>;
+    setIconSelected: Dispatch<SetStateAction<IconProp>>;
   };
 };

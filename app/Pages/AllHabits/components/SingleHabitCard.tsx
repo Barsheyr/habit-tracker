@@ -80,8 +80,7 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
       ),
     };
 
-    const habitToUpdateInTheServer =
-      convertIconsToTextOfHabits(updateAllHabits);
+    const habitToUpdateInTheServer = convertIconsToTextOfHabits(updatedHabits);
 
     editTheHabitInServer(habitToUpdateInTheServer);
 

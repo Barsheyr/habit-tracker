@@ -6,7 +6,7 @@ import { useGlobalContextProvider } from "@/app/contextApi";
 import { faFlask, faQuestion } from "@fortawesome/free-solid-svg-icons";
 import { faChevronDown, faClose } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconWindow } from "./IconWindow/IconWindow";
+import IconWindow from "./IconWindow/IconWindow";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { TimerPicker } from "./TimePicker";
 import HabitWindowArea from "./HabitWindow/HabitWindowAreas";
@@ -29,11 +29,18 @@ type DayOption = {
 };
 
 function HabitWindow() {
-  const { habitWindowObject, darkModeObject, selectedItemsObject } =
-    useGlobalContextProvider();
+  const {
+    habitWindowObject,
+    darkModeObject,
+    selectedItemsObject,
+    openIconWindowObject,
+  } = useGlobalContextProvider();
   const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
   const { selectedItems } = selectedItemsObject;
+  const { openIconWindow, setOpenIconWindow, iconSelected, setIconSelected } =
+    openIconWindowObject;
+
   const { user } = useUser();
   //
   const [habitItem, setHabitItem] = useState<HabitType>({
@@ -47,9 +54,6 @@ function HabitWindow() {
     areas: [],
     completedDays: [],
   });
-
-  const [openIconWindow, setOpenIconWindow] = useState<boolean>(false);
-  const [iconSelected, setIconSelected] = useState<IconProp>(habitItem.icon);
 
   useEffect(() => {
     // when the window is closed empty reset the habit item
@@ -71,7 +75,7 @@ function HabitWindow() {
         setHabitItem(selectedItems as HabitType);
       }
     }
-  });
+  }, []);
 
   const onUpdateHabitName = (inputText: string) => {
     // creating a shallow copy of the habit item
@@ -193,12 +197,7 @@ function HabitWindow() {
       }`}
     >
       <TimerPicker onSaveTime={updateReminderTime} />
-      <IconWindow
-        openIconWindow={openIconWindow}
-        setOpenIconWindow={setOpenIconWindow}
-        iconSelected={iconSelected}
-        setIconSelected={setIconSelected}
-      />
+      <IconWindow />
       <Header />
       <InputNameAndIconButton
         onUpdateHabitName={onUpdateHabitName}
@@ -268,7 +267,7 @@ function InputNameAndIconButton({
     useGlobalContextProvider();
   const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
-  const { selectedItems, setSelectedItems } = selectedItemsObject;
+  const { selectedItems } = selectedItemsObject;
 
   function updateInputHabit(event: React.ChangeEvent<HTMLInputElement>) {
     onUpdateHabitName(event.target.value);

@@ -35,3 +35,62 @@ export async function GET(req: any) {
     return NextResponse.json({ error: error }, { status: 400 });
   }
 }
+
+export async function DELETE(request: any) {
+  try {
+    const { areaId } = await request.json(); // get the projectId from the request body
+    // get clerkId from the query parameters
+
+    const areaToDelete = await Area.findOneAndDelete({
+      _id: areaId,
+    });
+
+    if (!areaToDelete) {
+      return NextResponse.json({ message: "Area not found" }, { status: 404 });
+    }
+    return NextResponse.json({ message: "Area deleted successfully" });
+  } catch (error) {
+    console.log("error");
+    return NextResponse.json({ message: error });
+  }
+}
+
+export async function PUT(request: any) {
+  try {
+    const areaId = request.nextUrl.searchParams.get("areaId");
+    const { name, icon } = await request.json();
+    if (!areaId) {
+      return NextResponse.json(
+        { message: "Habit ID is required" },
+        { status: 400 }
+      );
+    }
+
+    await connectToDB();
+
+    // find update
+    const updatedArea = await Area.findOneAndUpdate(
+      { _id: areaId },
+      {
+        $set: {
+          name,
+          icon,
+        },
+      },
+      { returnDocument: "after" }
+    );
+
+    console.log(updatedArea);
+
+    return NextResponse.json({
+      message: "Area has been updated successfully",
+      area: updatedArea.value,
+    });
+  } catch (error) {
+    console.log("Error updating area:", error);
+    return NextResponse.json(
+      { message: "An error occurred while updating the area" },
+      { status: 500 }
+    );
+  }
+}

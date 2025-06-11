@@ -18,6 +18,7 @@ export default function scheduleNotifications(
   // split the notification time into time and the AM/PM modifier
   const [time, modifier] = notificationTime.split("");
   // split the time into hours and minuted
+  // eslint-disable-next-line prefer-const
   let [hours, minutes] = time.split(":").map(Number);
   //adjust hours based on AM/PM
   if (modifier === "PM" && hours < 12) hours += 12;

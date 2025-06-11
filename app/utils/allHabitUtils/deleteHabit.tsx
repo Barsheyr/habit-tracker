@@ -8,7 +8,7 @@ export async function deleteHabit(
   selectedItems: AreaType | HabitType | null
 ) {
   try {
-    const updateHabits: HabitType[] = allHabits.filter(
+    const updatedHabits: HabitType[] = allHabits.filter(
       (habit) => habit._id !== selectedItems?._id
     );
 
@@ -26,7 +26,7 @@ export async function deleteHabit(
       return { success: false, message: errorData.message };
     }
     const data = await response.json();
-    setAllHabits(updateHabits);
+    setAllHabits(updatedHabits);
     toast.success("Habit has been deleted successfully");
     return { success: true, message: data.message };
   } catch (error) {

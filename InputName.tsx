@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { useGlobalContextProvider } from "./app/contextApi";
 import { darkModeColor } from "./colors";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFlag } from "@fortawesome/free-solid-svg-icons";
+// import { faFlag } from "@fortawesome/free-solid-svg-icons";
 
 interface InputNameProps extends React.InputHTMLAttributes<HTMLInputElement> {
   placeholder?: string;
@@ -22,7 +22,7 @@ export default function InputName({
     openIconWindowObject: { setOpenIconWindow, iconSelected },
   } = useGlobalContextProvider();
 
-  const inputRef = useRef<HTMLImageElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     inputRef.current?.focus();

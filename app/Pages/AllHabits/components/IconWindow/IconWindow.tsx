@@ -1,34 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useState } from "react";
-import { faClose, faIcons } from "@fortawesome/free-solid-svg-icons";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { iconData } from "./IconData";
 import { useGlobalContextProvider } from "@/app/contextApi";
-import { darkModeColor } from "@/colors";
-// import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-export function IconWindow({
-  // openIconWindow,
-  // setOpenIconWindow,
-  // setIconSelected,
-  setSelectedIcon,
-}: {
-  setSelectionIcon: (icon: any) => void;
-  // openIconWindow: boolean;
-  // setOpenIconWindow: React.Dispatch<React.SetStateAction<boolean>>;
-  // iconSelected: IconProp;
-  // setIconSelected: React.Dispatch<React.SetStateAction<IconProp>>;
-}) {
+function IconsWindow() {
   const [allIcons, setAllIcons] = useState(iconData);
-  const { darkModeObject, iconBox, isDark } = useGlobalContextProvider();
+  const { darkModeObject, openIconWindowObject } = useGlobalContextProvider();
+  const { openIconWindow, setOpenIconWindow, setIconSelected } =
+    openIconWindowObject;
   const { isDarkMode } = darkModeObject;
-  const { iconBox, setOpenIconBox } = iconBox;
 
   function handleIconSelection(iconIndex: number) {
     const updatedAllIcons = allIcons.map((singleIcon, index) => {
       if (index === iconIndex) {
-        setSelectedIcon(singleIcon, faIcons);
+        setIconSelected(singleIcon.faIcon);
         return { ...singleIcon, isSelected: true };
       }
 
@@ -36,18 +25,18 @@ export function IconWindow({
     });
 
     setAllIcons(updatedAllIcons);
-    setOpenIconBox(false);
+    setOpenIconWindow(false);
   }
 
   return (
     <div
       className={` w-full left-0 flex   absolute justify-center items-center top-52 ${
-        openIconBox ? "flex" : "hidden"
+        openIconWindow ? "flex" : "hidden"
       }`}
     >
       <div
         className={` relative z-50 w-[400px] p-4 rounded-md border flex flex-col gap-6 shadow-md ${
-          isDark ? "bg-blackColorDark text-white" : "bg-white text-black"
+          isDarkMode ? "bg-blackColorDark text-white" : "bg-white text-black"
         }`}
       >
         <FontAwesomeIcon
@@ -71,8 +60,7 @@ export function IconWindow({
             width={50}
             height={50}
             onClick={() => {
-              setIconSelected(icon.faIcon);
-              setOpenIconWindow(false);
+              handleIconSelection(iconIndex);
             }}
           />
         ))}
@@ -80,3 +68,5 @@ export function IconWindow({
     </div>
   );
 }
+
+export default IconsWindow;

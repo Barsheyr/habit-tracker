@@ -1,4 +1,4 @@
-import { Icon, IconProp } from "@fortawesome/fontawesome-svg-core";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
 export type menuItemType = {
   name: string;

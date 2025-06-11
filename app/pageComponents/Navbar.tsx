@@ -34,7 +34,7 @@ const Navbar = () => {
               </Link>
             ) : (
               <div className="mt-4 flex flex-col gap-4 sm:mt-0 sm:flex-row sm:items-center">
-                <Link href={"/sign-up"}>
+                <Link href={"/sign-in"}>
                   <button
                     style={backgroundColorObject}
                     className="block sm:w-32 w-full rounded-lg px-9 py-3 text-sm font-medium text-white 
