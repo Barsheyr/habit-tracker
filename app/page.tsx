@@ -4,7 +4,7 @@ import Navbar from "./pageComponents/Navbar";
 
 const page = () => {
   return (
-    <div className="">
+    <div className="bg-gradient-to-b from-gray-900 to-black min-h-screen text-white">
       <Navbar />
       <HeroSection />
     </div>

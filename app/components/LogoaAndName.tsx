@@ -1,24 +1,19 @@
 import React from "react";
 
-const LogoaAndName = () => {
-  const defaultColor = "#0407d9";
-  const backgroundColorObject = { backgroundColor: defaultColor };
-
+const LogoAndName = () => {
   return (
-    <div className="flex gap-2 items-center">
-      <div className="text-2xl flex font-light">
-        <span className="flex items-center gap-2 font-light">
-          <div
-            style={backgroundColorObject}
-            className="text-white rounded-md p-2 text-center"
-          >
-            Arsheyr
-          </div>
-          <span className="font-light"> Tracker </span>
-        </span>
+    <div className="flex items-center gap-2">
+      {/* Logo Box */}
+      <div className="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-lg font-semibold shadow-md">
+        Arsheyr
       </div>
+
+      {/* Tracker Text */}
+      <span className="text-xl font-light text-black dark:text-gray-200 tracking-wide">
+        Tracker
+      </span>
     </div>
   );
 };
 
-export default LogoaAndName;
+export default LogoAndName;

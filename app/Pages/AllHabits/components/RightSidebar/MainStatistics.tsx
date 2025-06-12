@@ -99,10 +99,10 @@ const MainStatistics = () => {
 
       {/* . */}
       <div className="relative pt-3">
-        <CircularProgressBar progress={89} />
+        <CircularProgressBar progress={69} />
         <div className="flex flex-col justify-center items-center absolute top-[54%] left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-          <span className="font-bold text-xl text-blue-500"> 89% </span>
-          <span className="text-[11px] "> {progress} </span>
+          <span className="font-bold text-xl text-blue-500"> {progress} </span>
+          <span className="text-[11px] "> {`Today's Progress`} </span>
         </div>
       </div>
 
@@ -166,7 +166,7 @@ const CircularProgressBar: React.FC<CircularProgressBarProps> = ({
         stroke="none"
       >
         {data.map((entry, index) => (
-          <Cell key={`cell -${index} `} fill={COLORS[index % COLORS.length]} />
+          <Cell key={`cell-${index} `} fill={COLORS[index % COLORS.length]} />
         ))}
       </Pie>
     </PieChart>

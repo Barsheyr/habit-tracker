@@ -3,7 +3,7 @@ import AllHabitsSearchBar from "./AllHabitsSearchBar";
 import DarkMode from "./DarkMode";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import { defaultColor, darkModeColor } from "@/colors";
 
@@ -19,6 +19,7 @@ const AllHabitsTopBar = () => {
     },
   };
 
+  const { user } = useUser();
   function openSideBarFunction() {
     setOpenSideBar(!openSideBar);
   }
@@ -60,7 +61,7 @@ const AllHabitsTopBar = () => {
           >
             <span className="text-xl">
               <span className="font-bold"> Hi There </span>
-              <span className=" font-light"> Ali </span>
+              <span className=" font-light text-sm"> {user?.fullName} </span>
             </span>
 
             <span className="font-light text-[12px] text-gray-400">

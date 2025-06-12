@@ -2,22 +2,24 @@ import React from "react";
 
 const HeroSection = () => {
   return (
-    <div className="flex flex-col mx-16 items-center mt-[100px] gap-6">
-      <div className="font-bold text-3xl text-center">
-        Build the habits that <span className="text-blue-500"> matter! </span>
-      </div>
-      <p className="text-center text-sm sm:w-[430px] w-[370px]">
-        feeling overwhelmed? Our easy-to-use habit tracker help you take control
-        of your day and achieve your goals
+    <section className="flex flex-col items-center justify-center text-center px-4 sm:px-8 md:px-16 mt-24 gap-10">
+      <h1 className="text-4xl sm:text-7xl font-bold leading-tight">
+        Build better habits. <span className="text-blue-600">Every day.</span>
+      </h1>
+
+      <p className="text-xl sm:4xl max-w-md sm:max-w-2xl">
+        Stay consistent, stay motivated. Our simple habit tracker helps you take
+        charge of your routine and turn goals into progress — one step at a
+        time.
       </p>
+
       <button
-        className="text-sm font-light rounded-lg px-9 py-3 text-white transition bg-blue-500
-          focus:outline-none"
+        className="mt-4 text-sm sm:text-base font-medium rounded-full px-8 py-3 bg-blue-600 text-white hover:bg-blue-700 transition"
         type="button"
       >
-        {"Let's get started!"}
+        Start Tracking Now
       </button>
-    </div>
+    </section>
   );
 };
 

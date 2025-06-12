@@ -1,8 +1,12 @@
 import React, { useEffect } from "react";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGlobalContextProvider } from "@/app/contextApi";
+import {
+  faArrowAltCircleLeft,
+  faArrowAltCircleRight,
+} from "@fortawesome/free-solid-svg-icons";
+
 import {
   getFormattedDate,
   getDateString,
@@ -54,7 +58,7 @@ const HabitContainerTop = () => {
             <FontAwesomeIcon
               height={20}
               width={20}
-              icon={faArrowLeft}
+              icon={faArrowAltCircleLeft}
               className="text-white"
             />
           </div>
@@ -65,7 +69,7 @@ const HabitContainerTop = () => {
             <FontAwesomeIcon
               height={20}
               width={20}
-              icon={faArrowRight}
+              icon={faArrowAltCircleRight}
               className="text-white"
             />
           </div>

@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useGlobalContextProvider } from "@/app/contextApi";
 import { AreaType } from "@/app/Types/GlobalTypes";
+import { defaultColor, darkModeColor } from "@/colors";
 
 export default function AreaContainer() {
-  const { allAreasObject, selectedAreaStringObject } =
+  const { allAreasObject, selectedAreaStringObject, darkModeObject } =
     useGlobalContextProvider();
   const { allAreas } = allAreasObject;
   const { setSelectedAreaString } = selectedAreaStringObject;
+  const { isDarkMode } = darkModeObject;
   // state to keep track of selected areas
   const [selectedAreas, setSelectedAreas] = useState<{
     [key: number]: boolean;
@@ -42,7 +44,14 @@ export default function AreaContainer() {
   }, [allAreas]);
 
   return (
-    <div className="p-5 bg-white rounded-md flex gap-3 items-center transition-all mt-5 text-sm">
+    <div
+      style={{
+        backgroundColor: isDarkMode
+          ? darkModeColor.background
+          : defaultColor.backgroundSlate,
+      }}
+      className="p-5 bg-white rounded-md flex gap-3 items-center transition-all mt-5 text-sm"
+    >
       {allAreas.map((area: AreaType, index) => (
         <div onClick={() => toggleSelection(index)} key={index}>
           <SingleAreaContainer
