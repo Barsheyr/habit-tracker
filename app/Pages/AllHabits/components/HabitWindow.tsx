@@ -38,7 +38,7 @@ function HabitWindow() {
   const { openHabitWindow } = habitWindowObject;
   const { isDarkMode } = darkModeObject;
   const { selectedItems } = selectedItemsObject;
-  const { openIconWindow, setOpenIconWindow, iconSelected, setIconSelected } =
+  const { setOpenIconWindow, iconSelected, setIconSelected } =
     openIconWindowObject;
 
   const { user } = useUser();
@@ -160,11 +160,22 @@ function HabitWindow() {
   }, [iconSelected]);
 
   useEffect(() => {
+    // Update clerkUserId when user becomes available
+    if (user?.id && habitItem.clerkUserId === "") {
+      setHabitItem((prev) => ({
+        ...prev,
+        clerkUserId: user.id,
+      }));
+    }
+  }, [user?.id, habitItem.clerkUserId]);
+
+  useEffect(() => {
     if (openHabitWindow) {
       setHabitItem({
         _id: "",
         name: "",
         icon: faQuestion,
+        clerkUserId: user?.id || "", // Add this line
         frequency: [{ type: "Daily", days: ["Mo"], number: 1 }],
         notificationTime: "",
         isNotificationOn: false,
@@ -178,7 +189,7 @@ function HabitWindow() {
         setHabitItem(selectedItems as HabitType);
       }
     }
-  }, [openHabitWindow]);
+  }, [openHabitWindow, user?.id]);
 
   useEffect(() => {
     if (selectedItems) {
@@ -716,6 +727,7 @@ function SaveButton({ habit }: { habit: HabitType }) {
   const { openHabitWindow, setOpenHabitWindow } = habitWindowObject;
   const { selectedItems, setSelectedItems } = selectedItemsObject;
   const [buttonText, setButtonText] = useState("Add a Habit");
+  const { user } = useUser();
 
   useEffect(() => {
     if (selectedItems) {
@@ -726,9 +738,19 @@ function SaveButton({ habit }: { habit: HabitType }) {
   }, [openHabitWindow, selectedItems]);
 
   function checkHabitObject() {
+    // Add this check at the beginning
+    if (!user?.id) {
+      return toast.error("Please wait for authentication to load");
+    }
+
     if (!selectedItems) {
       if (habit.name.trim() === "") {
         return toast.error("the habit name filed is still empty");
+      }
+
+      // Add this check to ensure clerkUserId is set
+      if (!habit.clerkUserId) {
+        return toast.error("User authentication error. Please try again.");
       }
 
       const habitExist = allHabits.some(

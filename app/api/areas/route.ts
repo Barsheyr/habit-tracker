@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import connectToDB from "@/app/lib/connectToDB";
 import { NextResponse } from "next/server";
 import Area from "@/app/Models/AreaSchema";
@@ -8,6 +9,14 @@ export async function POST(req: Request) {
     await connectToDB();
 
     const { name, icon, clerkUserId } = await req.json();
+
+    // ✅ Explicit validation
+    if (!clerkUserId) {
+      return NextResponse.json(
+        { error: "clerkUserId is required" },
+        { status: 400 }
+      );
+    }
 
     const area = new Area({
       name,
@@ -27,7 +36,7 @@ export async function POST(req: Request) {
 export async function GET(req: any) {
   try {
     const clerkId = req.nextUrl.searchParams.get("clerkId");
-    await connectToDB;
+    await connectToDB();
     const areas = await Area.find({ clerkUserId: clerkId });
     return NextResponse.json({ areas: areas });
   } catch (error) {

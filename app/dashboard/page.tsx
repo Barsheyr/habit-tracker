@@ -76,7 +76,7 @@ const Dashboard = () => {
     <div
       style={{
         backgroundColor: isDarkMode
-          ? darkModeColor.whiteColor
+          ? darkModeColor.backgroundSlate
           : defaultColor.backgroundSlate,
       }}
       className="flex"

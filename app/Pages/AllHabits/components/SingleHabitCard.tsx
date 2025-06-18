@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircle } from "@fortawesome/free-solid-svg-icons"; // Add this import for fallback
 import { Checkbox, IconButton } from "@mui/material";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -29,12 +30,20 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
   const currentHabit =
     allHabits.find((habit) => habit._id === singleHabit._id) || singleHabit;
 
-  // const [checked, setChecked] = useState(
-  //   singleHabit.completedDays.some((day) => day.date === selectedCurrentDate)
-  // );
   const [checked, setChecked] = useState(
     currentHabit.completedDays.some((day) => day.date === selectedCurrentDate)
   );
+
+  // Helper function to get a valid icon
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getValidIcon = (icon: any) => {
+    // Check if icon exists and has the required properties
+    if (icon && typeof icon === "object" && (icon.iconName || icon.icon)) {
+      return icon;
+    }
+    // Return fallback icon
+    return faCircle;
+  };
 
   function handleClickedCheckbox(event: React.ChangeEvent<HTMLInputElement>) {
     const checked = event.target.checked;
@@ -61,7 +70,6 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
     const habitToUpdateInTheServer = convertIconsToTextOfHabits(updatedHabits);
     editTheHabitInServer(habitToUpdateInTheServer);
 
-    // update the habits state
     const updateAllHabits: HabitType[] = allHabits.map((habit) => {
       if (habit._id === updatedHabits._id) {
         return updatedHabits;
@@ -81,10 +89,8 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
     };
 
     const habitToUpdateInTheServer = convertIconsToTextOfHabits(updatedHabits);
-
     editTheHabitInServer(habitToUpdateInTheServer);
 
-    // update the habits state
     const updateAllHabits: HabitType[] = allHabits.map((habit) => {
       if (habit._id === updatedHabits._id) {
         return updatedHabits;
@@ -105,7 +111,6 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
     console.log(singleHabit);
     event.stopPropagation();
     setOpenDropdown(true);
-    // select the single habit
     setSelectedItems(singleHabit);
   }
 
@@ -118,7 +123,6 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
 
   return (
     <div className="flex p-3 items-center justify-between">
-      {/* checkbox */}
       <Checkbox
         icon={<RadioButtonUncheckedIcon />}
         checkedIcon={<CheckCircleIcon />}
@@ -140,19 +144,17 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
         className="flex justify-between gap-2 w-full p-3 py-4 rounded-md bg-slate-50"
       >
         <div className="w-full">
-          {/* . */}
           <div className="flex gap-2 justify-between">
             <div className="flex gap-2 items-center">
               <FontAwesomeIcon
                 className="p-3 rounded-full h-4 w-4 bg-blue-500 text-white"
-                icon={singleHabit.icon}
+                icon={getValidIcon(singleHabit.icon)}
                 height={20}
                 width={20}
               />
               <span className=""> {singleHabit.name} </span>
             </div>
           </div>
-          {/* . */}
           <div className="flex gap-2 mt-2">
             {singleHabit.areas.map((singleArea, index) => (
               <div
@@ -173,7 +175,6 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
           </div>
         </div>
       </div>
-      {/* button */}
       <div className="w-10 flex items-center justify-center">
         <IconButton onClick={handleClickedThreeDots}>
           <MoreVertIcon sx={{ color: isDarkMode ? "white" : "gray" }} />
@@ -184,23 +185,28 @@ export function HabitCard({ singleHabit }: { singleHabit: HabitType }) {
 }
 
 async function editTheHabitInServer(habit: HabitType) {
-  const response = await fetch(`/api/habits?habitsId=${habit._id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      name: habit.name,
-      icon: habit.icon,
-      frequency: habit.frequency,
-      notificationTime: habit.notificationTime,
-      isNotificationOn: habit.isNotificationOn,
-      areas: habit.areas,
-      completedDays: habit.completedDays,
-    }),
-  });
+  try {
+    const response = await fetch(`/api/habits?habitId=${habit._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: habit.name,
+        icon: habit.icon,
+        frequency: habit.frequency,
+        notificationTime: habit.notificationTime,
+        isNotificationOn: habit.isNotificationOn,
+        areas: habit.areas,
+        completedDays: habit.completedDays,
+      }),
+    });
 
-  if (!response.ok) {
-    throw new Error("Failed to edit habit");
+    if (!response.ok) {
+      throw new Error("Failed to edit habit");
+    }
+  } catch (error) {
+    console.error("Error updating habit:", error);
+    // You might want to show a toast notification or handle this error differently
   }
 }
